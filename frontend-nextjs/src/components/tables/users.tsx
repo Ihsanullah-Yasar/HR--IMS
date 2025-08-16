@@ -13,6 +13,9 @@ import { ApiResponse, Meta } from "@/lib/Types/api";
 import { toast } from "sonner";
 import { useRouter, useSearchParams } from "next/navigation";
 import { DeleteAlertDialog } from "@/components/ui/delete-alert-dialog";
+import { UserTableLoadingSkeleton } from "../shared/skeleton/tableSkeleton";
+import { userFilterConfig, userSortOptions } from "../filterConfigs/users";
+import DynamicTableFilters from "../table-filters";
 
 export default function UserTable() {
   const queryClient = useQueryClient();
@@ -43,7 +46,7 @@ export default function UserTable() {
   });
 
   if (isLoading) {
-    return <div>loading...</div>;
+    return <UserTableLoadingSkeleton columns={4} rows={10} />;
   }
 
   if (isError) {
@@ -77,11 +80,19 @@ export default function UserTable() {
           </div>
         </CardHeader>
         <CardContent>
-          <DataTable
-            columns={getUserColumns({ onDeleteClick: handleDeleteClick })}
-            data={data?.data ? data?.data : ([] as User[])}
-            meta={data?.meta ? data.meta : ({} as Meta)}
-          />
+          <div>
+            <DynamicTableFilters
+              title="User Filters"
+              sortOptions={userSortOptions}
+              filterConfigs={userFilterConfig}
+            />
+
+            <DataTable
+              columns={getUserColumns({ onDeleteClick: handleDeleteClick })}
+              data={data?.data ? data?.data : ([] as User[])}
+              meta={data?.meta ? data.meta : ({} as Meta)}
+            />
+          </div>
         </CardContent>
       </Card>
 

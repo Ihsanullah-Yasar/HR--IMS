@@ -23,6 +23,7 @@ const handleResponse = async <T>(response: Response): Promise<T> => {
   return data;
 };
 
+
 const createFetchApi = (config: any) => {
   const { baseUrl, defaultHeaders = {}, timeout = DEFAULT_TIMEOUT } = config;
 

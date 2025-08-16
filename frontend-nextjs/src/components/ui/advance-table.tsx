@@ -22,8 +22,6 @@ import { Meta } from "@/lib/Types/api";
 import TableFilter from "../table-filters";
 
 import { Dispatch, SetStateAction } from "react";
-import DynamicTableFilters from "../table-filters";
-import { userFilterConfig, userSortOptions } from "../filterConfigs/users";
 
 interface FilterData {
   name: string | null;
@@ -66,12 +64,7 @@ export function DataTable<TData, TValue>({
   });
 
   return (
-    <div>
-      <DynamicTableFilters
-        title="User Filters"
-        sortOptions={userSortOptions}
-        filterConfigs={userFilterConfig}
-      />
+    <>
       <div className="rounded-md border">
         <Table>
           <TableHeader>
@@ -125,6 +118,6 @@ export function DataTable<TData, TValue>({
       <div className="py-4">
         <DataTablePagination table={table} meta={meta} />
       </div>
-    </div>
+    </>
   );
 }

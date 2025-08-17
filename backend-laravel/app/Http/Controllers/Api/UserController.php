@@ -9,16 +9,15 @@ use App\Http\Requests\UpdateUserRequest;
 use App\Http\Resources\UserResource;
 use Illuminate\Support\Facades\Hash;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Database\QueryException;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Http\Request;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
+use App\Traits\ApiResponseTrait;
 
 class UserController extends Controller
 {
+    use ApiResponseTrait;
     /**
      * Display a listing of the resource.
      *
@@ -27,51 +26,37 @@ class UserController extends Controller
      */
     public function index(Request $request)
     {
-        try {
-            $users = QueryBuilder::for(User::class)->allowedFilters(
-                AllowedFilter::partial('name'),
-                AllowedFilter::partial('email')
-            )->allowedSorts(['name', 'email', 'created_at'])->paginate($request->input('per_page', 15));
+        $users = QueryBuilder::for(User::class)->allowedFilters(
+            AllowedFilter::partial('name'),
+            AllowedFilter::partial('email')
+        )->allowedSorts(['name', 'email', 'created_at'])->paginate($request->input('per_page', 15));
 
-            // $perPage = $request->input('per_page', 15);
-            // $sortBy = $request->input('sort_by', 'created_at');
-            // $sortDirection = $request->input('sort_direction', 'desc');
-            // $search = $request->input('search');
+        // $perPage = $request->input('per_page', 15);
+        // $sortBy = $request->input('sort_by', 'created_at');
+        // $sortDirection = $request->input('sort_direction', 'desc');
+        // $search = $request->input('search');
 
-            // $query = User::query()
-            //     ->when($search, function ($query) use ($search) {
-            //         $query->where(function ($q) use ($search) {
-            //             $q->where('name', 'like', "%{$search}%")
-            //                 ->orWhere('email', 'like', "%{$search}%");
-            //         });
-            //     });
+        // $query = User::query()
+        //     ->when($search, function ($query) use ($search) {
+        //         $query->where(function ($q) use ($search) {
+        //             $q->where('name', 'like', "%{$search}%")
+        //                 ->orWhere('email', 'like', "%{$search}%");
+        //         });
+        //     });
 
-            // $users = $query->orderBy($sortBy, $sortDirection)
-            //     ->paginate($perPage);
+        // $users = $query->orderBy($sortBy, $sortDirection)
+        //     ->paginate($perPage);
 
 
-            $resource = UserResource::collection($users);
-            $array = $resource->response()->getData(true);
+        $resource = UserResource::collection($users);
+        $array = $resource->response()->getData(true);
 
-            return response()->json([
-                'status' => 'success',
-                'data' => $array['data'],
-                'links' => $array['links'] ?? null,
-                'meta' => $array['meta'] ?? null,
-            ]);
-        } catch (\Exception $e) {
-            Log::error('Error fetching users: ' . $e->getMessage(), [
-                'file' => $e->getFile(),
-                'line' => $e->getLine(),
-                'trace' => $e->getTraceAsString()
-            ]);
-
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Failed to fetch users',
-                'error' => config('app.debug') ? $e->getMessage() : 'An unexpected error occurred'
-            ], Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
+        return response()->json([
+            'status' => 'success',
+            'data'   => $array['data'],
+            'links'  => $array['links'] ?? null,
+            'meta'   => $array['meta'] ?? null,
+        ]);
     }
 
     /**
@@ -82,42 +67,16 @@ class UserController extends Controller
      */
     public function store(StoreUserRequest $request): JsonResponse
     {
-        try {
-            $validated = $request->validated();
-            $validated['password'] = Hash::make($validated['password']);
+        $validated = $request->validated();
+        $validated['password'] = Hash::make($validated['password']);
 
-            $user = User::create($validated);
+        $user = User::create($validated);
 
-            return response()->json([
-                'status' => 'success',
-                'message' => 'User created successfully',
-                'data' => new UserResource($user)
-            ], Response::HTTP_CREATED);
-        } catch (QueryException $e) {
-            Log::error('Database error while creating user: ' . $e->getMessage(), [
-                'file' => $e->getFile(),
-                'line' => $e->getLine(),
-                'trace' => $e->getTraceAsString()
-            ]);
-
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Failed to create user',
-                'error' => config('app.debug') ? $e->getMessage() : 'Database error occurred'
-            ], Response::HTTP_INTERNAL_SERVER_ERROR);
-        } catch (\Exception $e) {
-            Log::error('Error creating user: ' . $e->getMessage(), [
-                'file' => $e->getFile(),
-                'line' => $e->getLine(),
-                'trace' => $e->getTraceAsString()
-            ]);
-
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Failed to create user',
-                'error' => config('app.debug') ? $e->getMessage() : 'An unexpected error occurred'
-            ], Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
+        return $this->successResponse(
+            new UserResource($user),
+            'User created successfully',
+            Response::HTTP_CREATED
+        );
     }
 
     /**
@@ -128,36 +87,10 @@ class UserController extends Controller
      */
     public function show(User $user): JsonResponse
     {
-        try {
-            // $user->load(['roles', 'permissions', 'profile']);
-
-            return response()->json([
-                'status' => 'success',
-                'data' => new UserResource($user)
-            ]);
-        } catch (ModelNotFoundException $e) {
-            Log::error('User not found: ' . $e->getMessage(), [
-                'file' => $e->getFile(),
-                'line' => $e->getLine()
-            ]);
-
-            return response()->json([
-                'status' => 'error',
-                'message' => 'User not found'
-            ], Response::HTTP_NOT_FOUND);
-        } catch (\Exception $e) {
-            Log::error('Error fetching user: ' . $e->getMessage(), [
-                'file' => $e->getFile(),
-                'line' => $e->getLine(),
-                'trace' => $e->getTraceAsString()
-            ]);
-
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Failed to fetch user',
-                'error' => config('app.debug') ? $e->getMessage() : 'An unexpected error occurred'
-            ], Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
+        return $this->successResponse(
+            new UserResource($user),
+            'User retrieved successfully'
+        );
     }
 
     /**
@@ -169,48 +102,19 @@ class UserController extends Controller
      */
     public function update(UpdateUserRequest $request, User $user): JsonResponse
     {
-        try {
-            $validated = $request->validated();
+        $validated = $request->validated();
 
-            if (isset($validated['password'])) {
-                $validated['password'] = Hash::make($validated['password']);
-            }
-
-            $user->update($validated);
-            // $user->load(['roles', 'permissions', 'profile']);
-
-            return response()->json([
-                'status' => 'success',
-                'message' => 'User updated successfully',
-                'data' => new UserResource($user)
-            ]);
-        } catch (QueryException $e) {
-            Log::error('Database error while updating user: ' . $e->getMessage(), [
-                'user_id' => $user->id,
-                'file' => $e->getFile(),
-                'line' => $e->getLine(),
-                'trace' => $e->getTraceAsString()
-            ]);
-
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Failed to update user',
-                'error' => config('app.debug') ? $e->getMessage() : 'Database error occurred'
-            ], Response::HTTP_INTERNAL_SERVER_ERROR);
-        } catch (\Exception $e) {
-            Log::error('Error updating user: ' . $e->getMessage(), [
-                'user_id' => $user->id,
-                'file' => $e->getFile(),
-                'line' => $e->getLine(),
-                'trace' => $e->getTraceAsString()
-            ]);
-
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Failed to update user',
-                'error' => config('app.debug') ? $e->getMessage() : 'An unexpected error occurred'
-            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        if (isset($validated['password'])) {
+            $validated['password'] = Hash::make($validated['password']);
         }
+
+        $user->update($validated);
+        // $user->load(['roles', 'permissions', 'profile']);
+
+        return $this->successResponse(
+            new UserResource($user),
+            'User updated successfully'
+        );
     }
 
     /**
@@ -221,39 +125,12 @@ class UserController extends Controller
      */
     public function destroy(User $user): JsonResponse
     {
-        try {
-            $user->delete();
+        $user->delete();
 
-            return response()->json([
-                'status' => 'success',
-                'message' => 'User deleted successfully'
-            ]);
-        } catch (QueryException $e) {
-            Log::error('Database error while deleting user: ' . $e->getMessage(), [
-                'user_id' => $user->id,
-                'file' => $e->getFile(),
-                'line' => $e->getLine(),
-                'trace' => $e->getTraceAsString()
-            ]);
-
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Failed to delete user',
-                'error' => config('app.debug') ? $e->getMessage() : 'Database error occurred'
-            ], Response::HTTP_INTERNAL_SERVER_ERROR);
-        } catch (\Exception $e) {
-            Log::error('Error deleting user: ' . $e->getMessage(), [
-                'user_id' => $user->id,
-                'file' => $e->getFile(),
-                'line' => $e->getLine(),
-                'trace' => $e->getTraceAsString()
-            ]);
-
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Failed to delete user',
-                'error' => config('app.debug') ? $e->getMessage() : 'An unexpected error occurred'
-            ], Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
+        return $this->successResponse(
+            null,
+            'User deleted successfully',
+            Response::HTTP_OK
+        );
     }
 }

@@ -6,6 +6,7 @@ import {
   UsersResponse,
 } from "@/lib/Types/user";
 import { ApiError, ApiResponse } from "@/lib/Types/api";
+import { handleServiceError } from "@/lib/utils/errorHandler";
 
 const USERS_ENDPOINT = "/users";
 
@@ -13,7 +14,7 @@ export const getUsers = async (
   queryString: string = ""
 ): Promise<ApiResponse<User[]>> => {
   try {
-    console.log(queryString);
+    // console.log(queryString);
     const response = await api.get<ApiResponse<User[]>>(USERS_ENDPOINT, {
       queryString,
     });
@@ -23,9 +24,7 @@ export const getUsers = async (
 
     return response;
   } catch (error) {
-    const apiError = error as ApiError;
-    console.log("Failed to fetch users:", apiError.message);
-    throw apiError;
+    throw handleServiceError(error, "Unable to load users");
   }
 };
 
@@ -37,9 +36,7 @@ export const getUserById = async (id: number): Promise<ApiResponse<User>> => {
     if (response.status === "error") throw new Error("User not found");
     return response;
   } catch (error) {
-    const apiError = error as ApiError;
-    console.error(`Failed to fetch user ${id}:`, apiError.message);
-    throw apiError;
+    throw handleServiceError(error, `Failed to fetch user ${id}:`);
   }
 };
 
@@ -49,9 +46,7 @@ export const createUser = async (userData: UserCreateData): Promise<User> => {
     if (!response) throw new Error("Failed to create user");
     return response;
   } catch (error) {
-    const apiError = error as ApiError;
-    console.error("Failed to create user:", apiError.message);
-    throw apiError;
+    throw handleServiceError(error, "Failed to create user.");
   }
 };
 
@@ -64,9 +59,7 @@ export const updateUser = async (
     if (!response) throw new Error("Failed to update user");
     return response;
   } catch (error) {
-    const apiError = error as ApiError;
-    console.log(`Failed to update user ${id}:`, apiError.message);
-    throw apiError;
+    throw handleServiceError(error, `Failed to update user ${id}:`);
   }
 };
 
@@ -75,8 +68,7 @@ export const deleteUser = async (id: number): Promise<void> => {
     await api.delete(`${USERS_ENDPOINT}/${id}`);
   } catch (error) {
     const apiError = error as ApiError;
-    console.error(`Failed to delete user ${id}:`, apiError.message);
-    throw apiError;
+    throw handleServiceError(error, `Failed to delete user ${id}:`);
   }
 };
 

@@ -26,7 +26,7 @@ export default function UserTable() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [userToDelete, setUserToDelete] = useState<User | null>(null);
 
-  const { data, isLoading, error, isError } = useQuery({
+  const { data, isLoading, error, isError, refetch } = useQuery({
     queryKey: [
       "users",
       paginationData.page,
@@ -50,8 +50,14 @@ export default function UserTable() {
   }
 
   if (isError) {
-    toast.error("Failed to fetch users");
-    return <div>Error: {error.message}</div>;
+    return (
+      <div className="flex flex-col items-center py-8">
+        <p className="text-red-500">{error.message}</p>
+        <Button onClick={() => refetch()} size="sm" className="mt-2">
+          Retry
+        </Button>
+      </div>
+    );
   }
 
   const handleDeleteClick = (user: User) => {

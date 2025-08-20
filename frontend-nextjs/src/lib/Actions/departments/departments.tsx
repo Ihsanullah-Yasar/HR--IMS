@@ -1,0 +1,109 @@
+import { api } from "@/lib/Api";
+import { ApiResponse } from "@/lib/Types/api";
+import {
+  Department,
+  departmentCreateData,
+  departmentUpdateData,
+} from "@/lib/Types/department";
+import { handleServiceError } from "@/lib/utils/errorHandler";
+
+const DEPARTMENTS_ENDPOINT = "/departments";
+
+export const getDepartments = async (
+  queryString: string = ""
+): Promise<ApiResponse<Department[]>> => {
+  try {
+    const response = await api.get<ApiResponse<Department[]>>(
+      DEPARTMENTS_ENDPOINT,
+      {
+        queryString,
+      }
+    );
+    if (!response.data) throw new Error("No data recieved");
+    return response;
+  } catch (error) {
+    throw handleServiceError(error, "Unable to load departments");
+  }
+};
+
+export const getDepartmentById = async (
+  id: number
+): Promise<ApiResponse<Department>> => {
+  try {
+    const response = await api.get<ApiResponse<Department>>(
+      `${DEPARTMENTS_ENDPOINT}/${id}`
+    );
+    if (response.status === "error") throw new Error("Department not found");
+    return response;
+  } catch (error) {
+    throw handleServiceError(error, `Failed to fetch department ${id}`);
+  }
+};
+
+export const createDepartment = async (
+  departmentData: departmentCreateData
+): Promise<ApiResponse<Department>> => {
+  try {
+    // Transform frontend field names to backend field names
+    const transformedData = {
+      code: departmentData.code,
+      name: departmentData.name,
+      timezone: departmentData.timezone,
+      parent_department_id: departmentData.parentDepartment || null,
+      manager_id: departmentData.manager || null, // Use selected manager
+    };
+
+    const response = await api.post<ApiResponse<Department>>(
+      DEPARTMENTS_ENDPOINT,
+      transformedData
+    );
+    if (!response.data) throw new Error("Failed to create department");
+    return response;
+  } catch (error) {
+    throw handleServiceError(error, "Failed to create department");
+  }
+};
+
+export const updateDepartment = async (
+  id: number,
+  departmentData: departmentUpdateData
+): Promise<ApiResponse<Department>> => {
+  try {
+    // Transform frontend field names to backend field names
+    const transformedData: any = {};
+
+    if (departmentData.code !== undefined)
+      transformedData.code = departmentData.code;
+    if (departmentData.name !== undefined)
+      transformedData.name = departmentData.name;
+    if (departmentData.timezone !== undefined)
+      transformedData.timezone = departmentData.timezone;
+    if (departmentData.parentDepartment !== undefined)
+      transformedData.parent_department_id = departmentData.parentDepartment;
+    if (departmentData.manager !== undefined)
+      transformedData.manager_id = departmentData.manager;
+
+    const response = await api.put<ApiResponse<Department>>(
+      `${DEPARTMENTS_ENDPOINT}/${id}`,
+      transformedData
+    );
+    if (!response.data) throw new Error("Failed to update department");
+    return response;
+  } catch (error) {
+    throw handleServiceError(error, "Failed to update department");
+  }
+};
+
+export const deleteDepartemnt = async (
+  id: number
+): Promise<ApiResponse<null>> => {
+  try {
+    const response = api.delete<ApiResponse<null>>(
+      `${DEPARTMENTS_ENDPOINT}/${id}`
+    );
+    if (!response) throw new Error("Failded to delete department");
+    return response;
+  } catch (error) {
+    throw handleServiceError(error, "Failed to delete department");
+  }
+};

@@ -29,6 +29,7 @@ return new class extends Migration
             $table->rememberToken();
             $table->timestamps();
             $table->softDeletes();
+            $table->foreignId('department_id')->nullable()->constrained('departments', 'd_id')->onDelete('set null');
         });
         Schema::table('users', function (Blueprint $table) {
             $table->foreign('created_by')->references('id')->on('users')->onDelete('set null');

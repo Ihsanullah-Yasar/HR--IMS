@@ -44,10 +44,12 @@ class UpdateDepartmentRequest extends FormRequest
             ],
             'parent_department_id' => [
                 'nullable',
+                'integer',
                 'exists:departments,d_id',
             ],
             'manager_id' => [
                 'nullable',
+                'integer',
                 'exists:users,id',
             ],
         ];

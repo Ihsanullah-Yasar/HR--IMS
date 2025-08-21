@@ -12,7 +12,7 @@ import { ApiResponse, Meta } from "@/lib/Types/api";
 import { toast } from "sonner";
 import { useSearchParams } from "next/navigation";
 import { DeleteAlertDialog } from "@/components/ui/delete-alert-dialog";
-import { UserTableLoadingSkeleton } from "../shared/skeleton/tableSkeleton";
+import { TableLoadingSkeleton } from "../shared/skeleton/tableSkeleton";
 import { Department } from "@/lib/Types/department";
 import {
   deleteDepartemnt,
@@ -54,7 +54,7 @@ export default function DepartmentTable() {
   });
 
   if (isLoading) {
-    return <UserTableLoadingSkeleton columns={6} rows={10} />;
+    return <TableLoadingSkeleton columns={6} rows={10} />;
   }
 
   if (isError) {

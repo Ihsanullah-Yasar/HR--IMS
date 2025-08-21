@@ -3,7 +3,7 @@
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 
-export function UserTableLoadingSkeleton({
+export function TableLoadingSkeleton({
   columns = 5,
   rows = 8,
 }: {

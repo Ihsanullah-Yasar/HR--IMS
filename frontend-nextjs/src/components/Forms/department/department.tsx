@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -14,23 +13,33 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import {
-  QueryClient,
-  useMutation,
-  useQueryClient,
-  useQuery,
-} from "@tanstack/react-query";
+import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { createDepartment } from "@/lib/Actions/departments/departments";
-import { getDepartments } from "@/lib/Actions/departments/departments";
+import {
+  getDepartments,
+  updateDepartment,
+} from "@/lib/Actions/departments/departments";
 import { getUsers } from "@/lib/Actions/users/users";
 import { Combobox } from "@/components/ui/combobox";
 import { Department } from "@/lib/Types/department";
 import { User } from "@/lib/Types/user";
 import React from "react";
 
-export const DepartmentForm = () => {
+type Mode = "create" | "update";
+
+type DepartmentFormProps = {
+  mode: Mode;
+  defaultValues?: Partial<DepartmentFormData>;
+  departmentId?: number; // needed for update mutation
+};
+
+export const DepartmentForm = ({
+  mode,
+  defaultValues,
+  departmentId,
+}: DepartmentFormProps) => {
   const router = useRouter();
   const queryClient = useQueryClient();
 
@@ -66,18 +75,62 @@ export const DepartmentForm = () => {
     }));
   }, [usersData]);
 
-  const { mutate: createDepartmentMutaion, isPending } = useMutation({
-    mutationFn: createDepartment,
+  //   const { mutate: createDepartmentMutaion, isPending } = useMutation({
+  //     mutationFn: createDepartment,
+  //     onSuccess: () => {
+  //       queryClient.invalidateQueries({ queryKey: ["departments"] });
+  //       toast.success("Department created successfully!");
+  //       router.push("/dashboard/departments");
+  //     },
+  //     onError: (error: any) => {
+  //       // Try to parse backend validation error
+  //       if (error?.status === 422 && error?.errors) {
+  //         const errors = error.errors;
+  //         Object.entries(errors).forEach(([field, messages]) => {
+  //           form.setError(field as keyof DepartmentFormData, {
+  //             type: "server",
+  //             message: Array.isArray(messages)
+  //               ? messages.join(" ")
+  //               : String(messages),
+  //           });
+  //         });
+  //       } else {
+  //         toast.error("Failed to create department, Try again");
+  //         console.log(error);
+  //       }
+  //     },
+  //   });
+console.log("Parent dept",defaultValues?.parentDepartment)
+  const form = useForm<DepartmentFormData>({
+    defaultValues: {
+      code: defaultValues?.code || "",
+      name: defaultValues?.name || "",
+      timezone: defaultValues?.timezone || "UTC",
+      parentDepartment: defaultValues?.parentDepartment ?? null,
+      manager: defaultValues?.manager ?? null,
+    },
+    resolver: zodResolver(departmentSchema),
+  });
+
+  // Mutations
+  const mutation = useMutation({
+    mutationFn:
+      mode === "create"
+        ? createDepartment
+        : (data: DepartmentFormData) =>
+            updateDepartment(departmentId as number, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["departments"] });
-      toast.success("Department created successfully!");
+      toast.success(
+        mode === "create"
+          ? "Department created successfully!"
+          : "Department updated successfully!"
+      );
       router.push("/dashboard/departments");
     },
     onError: (error: any) => {
-      // Try to parse backend validation error
       if (error?.status === 422 && error?.errors) {
-        const errors = error.errors;
-        Object.entries(errors).forEach(([field, messages]) => {
+        Object.entries(error.errors).forEach(([field, messages]) => {
           form.setError(field as keyof DepartmentFormData, {
             type: "server",
             message: Array.isArray(messages)
@@ -86,40 +139,34 @@ export const DepartmentForm = () => {
           });
         });
       } else {
-        toast.error("Failed to create department, Try again");
-        console.log(error);
+        toast.error(
+          mode === "create"
+            ? "Failed to create department. Try again."
+            : "Failed to update department. Try again."
+        );
       }
     },
   });
 
-  const form = useForm<DepartmentFormData>({
-    defaultValues: {
-      code: "",
-      name: "",
-      timezone: "UTC",
-      parentDepartment: null,
-      manager: null,
-    },
-    resolver: zodResolver(departmentSchema),
-  });
-
-  const CreateDepartmentHandler: SubmitHandler<DepartmentFormData> = async (
-    data
-  ) => {
-    createDepartmentMutaion(data);
+  const onSubmit: SubmitHandler<DepartmentFormData> = async (data) => {
+    mutation.mutate(data);
   };
+  //   const CreateDepartmentHandler: SubmitHandler<DepartmentFormData> = async (
+  //     data
+  //   ) => {
+  //     createDepartmentMutaion(data);
+  //   };
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Department Create Form</CardTitle>
+        <CardTitle>
+          {mode === "create" ? "Create Department" : "Update Department"}
+        </CardTitle>
       </CardHeader>
       <CardContent>
         <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(CreateDepartmentHandler)}
-            className="space-y-8"
-          >
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
             <FormField
               control={form.control}
               name="code"
@@ -219,9 +266,17 @@ export const DepartmentForm = () => {
             />
             <Button
               type="submit"
-              disabled={isPending || departmentsLoading || usersLoading}
+              disabled={
+                mutation.isPending || departmentsLoading || usersLoading
+              }
             >
-              {isPending ? "Creating..." : "Create Department"}
+              {mutation.isPending
+                ? mode === "create"
+                  ? "Creating..."
+                  : "Updating..."
+                : mode === "create"
+                ? "Create Department"
+                : "Update Department"}
             </Button>
           </form>
         </Form>

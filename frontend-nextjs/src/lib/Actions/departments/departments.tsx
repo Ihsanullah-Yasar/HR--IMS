@@ -78,11 +78,20 @@ export const updateDepartment = async (
       transformedData.name = departmentData.name;
     if (departmentData.timezone !== undefined)
       transformedData.timezone = departmentData.timezone;
-    if (departmentData.parentDepartment !== undefined)
-      transformedData.parent_department_id = departmentData.parentDepartment;
-    if (departmentData.manager !== undefined)
-      transformedData.manager_id = departmentData.manager;
-
+    // Handle empty strings and convert to proper types
+    const departmentValue = departmentData.parentDepartment;
+    if (
+      departmentValue !== undefined &&
+      departmentValue &&
+      departmentValue !== ""
+    ) {
+      transformedData.parent_department_id = parseInt(departmentValue);
+    }
+    const managerValue = departmentData.manager;
+    if (managerValue !== undefined && managerValue && managerValue !== "") {
+      transformedData.manager_id = parseInt(managerValue);
+    }
+    console.log("Transformed data : ", transformedData);
     const response = await api.put<ApiResponse<Department>>(
       `${DEPARTMENTS_ENDPOINT}/${id}`,
       transformedData

@@ -91,6 +91,7 @@ class DepartmentController extends Controller
     public function update(UpdateDepartmentRequest $request, Department $department): JsonResponse
     {
         $validated = $request->validated();
+
         $department->update($validated);
         $department->load(['parentDepartment', 'manager', 'createdBy', 'updatedBy', 'deletedBy']);
 

@@ -25,7 +25,7 @@ export function handleServiceError(error: unknown, fallbackMessage: string): Api
   normalized.message = errorMessages[normalized.status] ?? fallbackMessage;
 
   if (process.env.NODE_ENV === "development") {
-    console.error("Service Error Normalized:", { raw: rawErr, normalized });
+    console.log("Service Error Normalized:", { raw: rawErr, normalized });
   }
 
   return normalized;

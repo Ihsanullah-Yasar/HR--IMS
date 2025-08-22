@@ -23,10 +23,11 @@ import {
 } from "@/lib/Actions/departments/departments";
 import { getUsers } from "@/lib/Actions/users/users";
 import { Combobox } from "@/components/ui/combobox";
-import { Department } from "@/lib/Types/department";
 import { User } from "@/lib/Types/user";
 import React from "react";
-
+import { useSaveMutation } from "@/hooks/useSaveMutation";
+import { Department } from "@/lib/Types/department";
+import { ApiResponse } from "@/lib/Types/api";
 type Mode = "create" | "update";
 
 type DepartmentFormProps = {
@@ -100,7 +101,7 @@ export const DepartmentForm = ({
   //       }
   //     },
   //   });
-console.log("Parent dept",defaultValues?.parentDepartment)
+  console.log("Parent dept", defaultValues?.parentDepartment);
   const form = useForm<DepartmentFormData>({
     defaultValues: {
       code: defaultValues?.code || "",
@@ -113,43 +114,68 @@ console.log("Parent dept",defaultValues?.parentDepartment)
   });
 
   // Mutations
-  const mutation = useMutation({
-    mutationFn:
-      mode === "create"
-        ? createDepartment
-        : (data: DepartmentFormData) =>
-            updateDepartment(departmentId as number, data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["departments"] });
-      toast.success(
-        mode === "create"
-          ? "Department created successfully!"
-          : "Department updated successfully!"
-      );
-      router.push("/dashboard/departments");
+  //   const mutation = useMutation({
+  //     mutationFn:
+  //       mode === "create"
+  //         ? createDepartment
+  //         : (data: DepartmentFormData) =>
+  //             updateDepartment(departmentId as number, data),
+  //     onSuccess: () => {
+  //       queryClient.invalidateQueries({ queryKey: ["departments"] });
+  //       toast.success(
+  //         mode === "create"
+  //           ? "Department created successfully!"
+  //           : "Department updated successfully!"
+  //       );
+  //       router.push("/dashboard/departments");
+  //     },
+  //     onError: (error: any) => {
+  //       if (error?.status === 422 && error?.errors) {
+  //         Object.entries(error.errors).forEach(([field, messages]) => {
+  //           form.setError(field as keyof DepartmentFormData, {
+  //             type: "server",
+  //             message: Array.isArray(messages)
+  //               ? messages.join(" ")
+  //               : String(messages),
+  //           });
+  //         });
+  //       } else {
+  //         toast.error(
+  //           mode === "create"
+  //             ? "Failed to create department. Try again."
+  //             : "Failed to update department. Try again."
+  //         );
+  //       }
+  //     },
+  //   });
+  const mutation = useSaveMutation<
+    ApiResponse<Department>,
+    DepartmentFormData,
+    { id: number; data: DepartmentFormData },
+    DepartmentFormData
+  >({
+    mode,
+    queryKey: "departments",
+    createFn: createDepartment,
+    updateFn: ({ id, data }) => updateDepartment(id, data),
+    form,
+    redirectTo: "/dashboard/departments",
+    successMessage: {
+      create: "Department created successfully",
+      update: "Department updated successfully",
     },
-    onError: (error: any) => {
-      if (error?.status === 422 && error?.errors) {
-        Object.entries(error.errors).forEach(([field, messages]) => {
-          form.setError(field as keyof DepartmentFormData, {
-            type: "server",
-            message: Array.isArray(messages)
-              ? messages.join(" ")
-              : String(messages),
-          });
-        });
-      } else {
-        toast.error(
-          mode === "create"
-            ? "Failed to create department. Try again."
-            : "Failed to update department. Try again."
-        );
-      }
+    errorMessage: {
+      create: "Failed to create department",
+      update: "Failed to update department",
     },
   });
 
   const onSubmit: SubmitHandler<DepartmentFormData> = async (data) => {
-    mutation.mutate(data);
+    if (mode === "create") {
+      mutation.mutate(data); // TCreateVars
+    } else {
+      mutation.mutate({ id: departmentId!, data }); // TUpdateVars
+    }
   };
   //   const CreateDepartmentHandler: SubmitHandler<DepartmentFormData> = async (
   //     data

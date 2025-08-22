@@ -78,18 +78,15 @@ export const updateDepartment = async (
       transformedData.name = departmentData.name;
     if (departmentData.timezone !== undefined)
       transformedData.timezone = departmentData.timezone;
-    // Handle empty strings and convert to proper types
-    const departmentValue = departmentData.parentDepartment;
-    if (
-      departmentValue !== undefined &&
-      departmentValue &&
-      departmentValue !== ""
-    ) {
-      transformedData.parent_department_id = parseInt(departmentValue);
+    // ✅ Add only if it's a valid number
+    const deptValue = parseInt(departmentData.parentDepartment ?? "");
+    if (!isNaN(deptValue)) {
+      transformedData.parent_department_id = deptValue;
     }
-    const managerValue = departmentData.manager;
-    if (managerValue !== undefined && managerValue && managerValue !== "") {
-      transformedData.manager_id = parseInt(managerValue);
+
+    const managerValue = parseInt(departmentData.manager ?? "");
+    if (!isNaN(managerValue)) {
+      transformedData.manager_id = managerValue;
     }
     console.log("Transformed data : ", transformedData);
     const response = await api.put<ApiResponse<Department>>(

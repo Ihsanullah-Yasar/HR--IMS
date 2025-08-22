@@ -5,6 +5,7 @@ import {
   departmentCreateData,
   departmentUpdateData,
 } from "@/lib/Types/department";
+import { User } from "@/lib/Types/user";
 import { handleServiceError } from "@/lib/utils/errorHandler";
 
 const DEPARTMENTS_ENDPOINT = "/departments";
@@ -23,6 +24,23 @@ export const getDepartments = async (
     return response;
   } catch (error) {
     throw handleServiceError(error, "Unable to load departments");
+  }
+};
+
+export const getDepartmentFormData = async (
+  excludeDepartmentId?: number
+): Promise<ApiResponse<{ departments: Department[]; managers: User[] }>> => {
+  try {
+    const queryParams = excludeDepartmentId
+      ? `?exclude_department_id=${excludeDepartmentId}`
+      : "";
+    const response = await api.get<
+      ApiResponse<{ departments: Department[]; managers: User[] }>
+    >(`${DEPARTMENTS_ENDPOINT}/form-data${queryParams}`);
+    if (!response.data) throw new Error("No data received");
+    return response;
+  } catch (error) {
+    throw handleServiceError(error, "Unable to load form data");
   }
 };
 

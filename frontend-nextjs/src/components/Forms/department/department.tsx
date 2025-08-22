@@ -17,15 +17,13 @@ import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { createDepartment } from "@/lib/Actions/departments/departments";
-import {
-  getDepartments,
-  updateDepartment,
-} from "@/lib/Actions/departments/departments";
-import { getUsers } from "@/lib/Actions/users/users";
+import { updateDepartment } from "@/lib/Actions/departments/departments";
+import { getDepartmentFormData } from "@/lib/Actions/departments/departments";
 import { Combobox } from "@/components/ui/combobox";
 import { User } from "@/lib/Types/user";
 import React from "react";
-import { useSaveMutation } from "@/hooks/useSaveMutation";
+import { useCreateMutation } from "@/hooks/useCreateMutation";
+import { useUpdateMutation } from "@/hooks/useUpdateMutation";
 import { Department } from "@/lib/Types/department";
 import { ApiResponse } from "@/lib/Types/api";
 type Mode = "create" | "update";
@@ -45,36 +43,32 @@ export const DepartmentForm = ({
   const queryClient = useQueryClient();
 
   // Fetch departments for parent department selection
-  const { data: departmentsData, isLoading: departmentsLoading } = useQuery({
-    queryKey: ["departments", "all"],
-    queryFn: () => getDepartments(""),
-  });
-
-  // Fetch users for manager selection
-  const { data: usersData, isLoading: usersLoading } = useQuery({
-    queryKey: ["users", "all"],
-    queryFn: () => getUsers(""),
+  const { data: formData, isLoading: formDataLoading } = useQuery({
+    queryKey: ["department-form-data", departmentId],
+    queryFn: () => getDepartmentFormData(departmentId),
+    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
   });
 
   // Transform departments data for combobox
   const departmentOptions = React.useMemo(() => {
-    if (!departmentsData?.data) return [];
-    return departmentsData.data.map((dept: Department) => ({
+    if (!formData?.data?.departments) return [];
+    return formData.data.departments.map((dept: Department) => ({
       value: dept.dId.toString(),
       label: `${dept.code} - ${dept.name}`,
-      searchValue: `${dept.code} ${dept.name}`, // Searchable by both code and name
+      searchValue: `${dept.code} ${dept.name}`.toLowerCase(), // Lowercase for better searching
     }));
-  }, [departmentsData]);
+  }, [formData?.data?.departments]);
 
-  // Transform users data for combobox
-  const userOptions = React.useMemo(() => {
-    if (!usersData?.data) return [];
-    return usersData.data.map((user: User) => ({
-      value: user.id.toString(),
-      label: user.name,
-      searchValue: user.name, // Searchable by name
+  // Transform managers data for combobox
+  const managerOptions = React.useMemo(() => {
+    if (!formData?.data?.managers) return [];
+    return formData.data.managers.map((manager: User) => ({
+      value: manager.id.toString(),
+      label: manager.name,
+      searchValue: manager.name.toLowerCase(),
+      email: manager.email, // Include email for additional context if needed
     }));
-  }, [usersData]);
+  }, [formData?.data?.managers]);
 
   //   const { mutate: createDepartmentMutaion, isPending } = useMutation({
   //     mutationFn: createDepartment,
@@ -113,75 +107,37 @@ export const DepartmentForm = ({
     resolver: zodResolver(departmentSchema),
   });
 
-  // Mutations
-  //   const mutation = useMutation({
-  //     mutationFn:
-  //       mode === "create"
-  //         ? createDepartment
-  //         : (data: DepartmentFormData) =>
-  //             updateDepartment(departmentId as number, data),
-  //     onSuccess: () => {
-  //       queryClient.invalidateQueries({ queryKey: ["departments"] });
-  //       toast.success(
-  //         mode === "create"
-  //           ? "Department created successfully!"
-  //           : "Department updated successfully!"
-  //       );
-  //       router.push("/dashboard/departments");
-  //     },
-  //     onError: (error: any) => {
-  //       if (error?.status === 422 && error?.errors) {
-  //         Object.entries(error.errors).forEach(([field, messages]) => {
-  //           form.setError(field as keyof DepartmentFormData, {
-  //             type: "server",
-  //             message: Array.isArray(messages)
-  //               ? messages.join(" ")
-  //               : String(messages),
-  //           });
-  //         });
-  //       } else {
-  //         toast.error(
-  //           mode === "create"
-  //             ? "Failed to create department. Try again."
-  //             : "Failed to update department. Try again."
-  //         );
-  //       }
-  //     },
-  //   });
-  const mutation = useSaveMutation<
+  const createMutation = useCreateMutation<
     ApiResponse<Department>,
     DepartmentFormData,
+    DepartmentFormData
+  >({
+    mutationFn: createDepartment, // (data) => returns Department
+    queryKey: "departments",
+    form,
+    redirectTo: "/dashboard/departments",
+    successMessage: "Department created successfully!",
+  });
+
+  const updateMutation = useUpdateMutation<
+    ApiResponse<Department>,
     { id: number; data: DepartmentFormData },
     DepartmentFormData
   >({
-    mode,
+    mutationFn: ({ id, data }) => updateDepartment(id, data),
     queryKey: "departments",
-    createFn: createDepartment,
-    updateFn: ({ id, data }) => updateDepartment(id, data),
     form,
     redirectTo: "/dashboard/departments",
-    successMessage: {
-      create: "Department created successfully",
-      update: "Department updated successfully",
-    },
-    errorMessage: {
-      create: "Failed to create department",
-      update: "Failed to update department",
-    },
+    successMessage: "Department updated successfully!",
   });
 
-  const onSubmit: SubmitHandler<DepartmentFormData> = async (data) => {
+  const onSubmit: SubmitHandler<DepartmentFormData> = (data) => {
     if (mode === "create") {
-      mutation.mutate(data); // TCreateVars
+      createMutation.mutate(data);
     } else {
-      mutation.mutate({ id: departmentId!, data }); // TUpdateVars
+      updateMutation.mutate({ id: departmentId!, data });
     }
   };
-  //   const CreateDepartmentHandler: SubmitHandler<DepartmentFormData> = async (
-  //     data
-  //   ) => {
-  //     createDepartmentMutaion(data);
-  //   };
 
   return (
     <Card>
@@ -258,7 +214,7 @@ export const DepartmentForm = ({
                       placeholder="Select parent department (optional)"
                       searchPlaceholder="Search departments..."
                       emptyText="No departments found."
-                      disabled={departmentsLoading}
+                      disabled={formDataLoading}
                     />
                   </FormControl>
                   <FormMessage>
@@ -275,13 +231,13 @@ export const DepartmentForm = ({
                   <FormLabel>Manager</FormLabel>
                   <FormControl>
                     <Combobox
-                      options={userOptions}
+                      options={managerOptions}
                       value={field.value || ""}
                       onValueChange={field.onChange}
                       placeholder="Select manager (optional)"
                       searchPlaceholder="Search users..."
                       emptyText="No users found."
-                      disabled={usersLoading}
+                      disabled={formDataLoading}
                     />
                   </FormControl>
                   <FormMessage>
@@ -293,15 +249,17 @@ export const DepartmentForm = ({
             <Button
               type="submit"
               disabled={
-                mutation.isPending || departmentsLoading || usersLoading
+                (mode === "create"
+                  ? createMutation.isPending
+                  : updateMutation.isPending) || formDataLoading
               }
             >
-              {mutation.isPending
-                ? mode === "create"
+              {mode === "create"
+                ? createMutation.isPending
                   ? "Creating..."
-                  : "Updating..."
-                : mode === "create"
-                ? "Create Department"
+                  : "Create Department"
+                : updateMutation.isPending
+                ? "Updating..."
                 : "Update Department"}
             </Button>
           </form>

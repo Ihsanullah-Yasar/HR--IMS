@@ -8,6 +8,7 @@ use App\Http\Requests\StoreDepartmentRequest;
 use App\Http\Requests\UpdateDepartmentRequest;
 use App\Http\Resources\DepartmentResource;
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Http\Request;
 use Spatie\QueryBuilder\AllowedFilter;
@@ -47,6 +48,36 @@ class DepartmentController extends Controller
         ]);
     }
 
+    /**
+     * Display a list of resources for select in dropdown.
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function formData(Request $request): JsonResponse
+    {
+        $excludeDepartmentId = $request->input('exclude_department_id');
+
+        $data = [
+            'departments' => DepartmentResource::collection(Department::select('d_id', 'name', 'code')
+                ->when(is_numeric($excludeDepartmentId), function ($query) use ($excludeDepartmentId) {
+                    return $query->where('d_id', '!=', (int) $excludeDepartmentId);
+                })
+                ->orderBy('name')
+                ->get()),
+            'managers' => User::select('id', 'name', 'email')
+                // ->whereHas('roles', function ($query) {
+                //     $query->where('name', 'manager');
+                // })
+                ->orderBy('name')
+                ->get()
+        ];
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $data
+        ]);
+    }
     /**
      * Store a newly created resource in storage.
      *

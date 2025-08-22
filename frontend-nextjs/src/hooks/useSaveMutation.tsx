@@ -82,3 +82,41 @@ export function useSaveMutation<
     },
   });
 }
+
+// this is a general hook for create and update but now its not used
+// bellow is usage in Forms
+// Mutations
+//   const mutation = useMutation({
+//     mutationFn:
+//       mode === "create"
+//         ? createDepartment
+//         : (data: DepartmentFormData) =>
+//             updateDepartment(departmentId as number, data),
+//     onSuccess: () => {
+//       queryClient.invalidateQueries({ queryKey: ["departments"] });
+//       toast.success(
+//         mode === "create"
+//           ? "Department created successfully!"
+//           : "Department updated successfully!"
+//       );
+//       router.push("/dashboard/departments");
+//     },
+//     onError: (error: any) => {
+//       if (error?.status === 422 && error?.errors) {
+//         Object.entries(error.errors).forEach(([field, messages]) => {
+//           form.setError(field as keyof DepartmentFormData, {
+//             type: "server",
+//             message: Array.isArray(messages)
+//               ? messages.join(" ")
+//               : String(messages),
+//           });
+//         });
+//       } else {
+//         toast.error(
+//           mode === "create"
+//             ? "Failed to create department. Try again."
+//             : "Failed to update department. Try again."
+//         );
+//       }
+//     },
+//   });

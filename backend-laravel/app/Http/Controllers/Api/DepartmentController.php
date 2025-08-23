@@ -54,15 +54,15 @@ class DepartmentController extends Controller
      * @param Request $request
      * @return JsonResponse
      */
-    public function formData(Request $request): JsonResponse
+    public function formData($id): JsonResponse
     {
-        $excludeDepartmentId = $request->input('exclude_department_id');
-
+        // $excludeDepartmentId = $request->input('exclude_department_id');
         $data = [
+            'editingDepartment' => new DepartmentResource(Department::findOrFail($id)),
             'departments' => DepartmentResource::collection(Department::select('d_id', 'name', 'code')
-                ->when(is_numeric($excludeDepartmentId), function ($query) use ($excludeDepartmentId) {
-                    return $query->where('d_id', '!=', (int) $excludeDepartmentId);
-                })
+                // ->when(is_numeric($excludeDepartmentId), function ($query) use ($excludeDepartmentId) {
+                //     return $query->where('d_id', '!=', (int) $excludeDepartmentId);
+                // })
                 ->orderBy('name')
                 ->get()),
             'managers' => User::select('id', 'name', 'email')

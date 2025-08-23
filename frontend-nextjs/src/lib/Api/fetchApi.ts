@@ -29,7 +29,7 @@ const createFetchApi = (config: any) => {
 
   return async <T>(endpoint: string, options: any): Promise<T> => {
     const { queryString, body, ...restOptions } = options;
-    const url = `${baseUrl}${endpoint}?${queryString ? queryString : ''}`;
+    const url = `${baseUrl}${endpoint}${queryString ? `?${queryString}` : ''}`;
     console.log(url)
     const headers = new Headers({
       'Content-Type': 'application/json',

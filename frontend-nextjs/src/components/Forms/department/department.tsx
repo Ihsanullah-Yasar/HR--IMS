@@ -1,5 +1,9 @@
 "use client";
-import { departmentSchema, DepartmentFormData } from "@/lib/Schemas/department";
+import {
+  departmentSchema,
+  DepartmentFormData,
+  DepartmentUpdateFormData,
+} from "@/lib/Schemas/department";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
@@ -24,51 +28,51 @@ import { User } from "@/lib/Types/user";
 import React from "react";
 import { useCreateMutation } from "@/hooks/useCreateMutation";
 import { useUpdateMutation } from "@/hooks/useUpdateMutation";
-import { Department } from "@/lib/Types/department";
+import { Department, DepartmentEditFormData } from "@/lib/Types/department";
 import { ApiResponse } from "@/lib/Types/api";
 type Mode = "create" | "update";
 
 type DepartmentFormProps = {
   mode: Mode;
-  defaultValues?: Partial<DepartmentFormData>;
+  formData?: Partial<DepartmentEditFormData>;
   departmentId?: number; // needed for update mutation
 };
 
 export const DepartmentForm = ({
   mode,
-  defaultValues,
+  formData,
   departmentId,
 }: DepartmentFormProps) => {
   const router = useRouter();
   const queryClient = useQueryClient();
 
   // Fetch departments for parent department selection
-  const { data: formData, isLoading: formDataLoading } = useQuery({
-    queryKey: ["department-form-data", departmentId],
-    queryFn: () => getDepartmentFormData(departmentId),
-    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
-  });
+  //   const { data: formData, isLoading: formDataLoading } = useQuery({
+  //     queryKey: ["department-form-data", departmentId],
+  //     queryFn: () => getDepartmentFormData(departmentId),
+  //     staleTime: 5 * 60 * 1000, // Cache for 5 minutes
+  //   });
 
   // Transform departments data for combobox
   const departmentOptions = React.useMemo(() => {
-    if (!formData?.data?.departments) return [];
-    return formData.data.departments.map((dept: Department) => ({
+    if (!formData?.departments) return [];
+    return formData.departments.map((dept: Department) => ({
       value: dept.dId.toString(),
       label: `${dept.code} - ${dept.name}`,
       searchValue: `${dept.code} ${dept.name}`.toLowerCase(), // Lowercase for better searching
     }));
-  }, [formData?.data?.departments]);
+  }, [formData?.departments]);
 
   // Transform managers data for combobox
   const managerOptions = React.useMemo(() => {
-    if (!formData?.data?.managers) return [];
-    return formData.data.managers.map((manager: User) => ({
+    if (!formData?.managers) return [];
+    return formData.managers.map((manager: User) => ({
       value: manager.id.toString(),
       label: manager.name,
       searchValue: manager.name.toLowerCase(),
       email: manager.email, // Include email for additional context if needed
     }));
-  }, [formData?.data?.managers]);
+  }, [formData?.managers]);
 
   //   const { mutate: createDepartmentMutaion, isPending } = useMutation({
   //     mutationFn: createDepartment,
@@ -95,7 +99,8 @@ export const DepartmentForm = ({
   //       }
   //     },
   //   });
-  console.log("Parent dept", defaultValues?.parentDepartment);
+  console.log("Parent dept", formData?.editingDepartment?.parentDepartment);
+  const defaultValues = formData?.editingDepartment;
   const form = useForm<DepartmentFormData>({
     defaultValues: {
       code: defaultValues?.code || "",
@@ -214,7 +219,7 @@ export const DepartmentForm = ({
                       placeholder="Select parent department (optional)"
                       searchPlaceholder="Search departments..."
                       emptyText="No departments found."
-                      disabled={formDataLoading}
+                      //   disabled={formDataLoading}
                     />
                   </FormControl>
                   <FormMessage>
@@ -237,7 +242,7 @@ export const DepartmentForm = ({
                       placeholder="Select manager (optional)"
                       searchPlaceholder="Search users..."
                       emptyText="No users found."
-                      disabled={formDataLoading}
+                      //   disabled={formDataLoading}
                     />
                   </FormControl>
                   <FormMessage>
@@ -249,9 +254,10 @@ export const DepartmentForm = ({
             <Button
               type="submit"
               disabled={
-                (mode === "create"
+                mode === "create"
                   ? createMutation.isPending
-                  : updateMutation.isPending) || formDataLoading
+                  : updateMutation.isPending
+                //   || formDataLoading
               }
             >
               {mode === "create"

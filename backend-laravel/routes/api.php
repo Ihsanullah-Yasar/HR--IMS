@@ -17,6 +17,6 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware('api')->group(function () {
     Route::apiResource('users', UserController::class);
-    Route::get('/departments/form-data', [DepartmentController::class, 'formData']);
+    Route::get('/departments/{id}/form-data', [DepartmentController::class, 'formData'])->whereNumber('id');
     Route::apiResource('departments', DepartmentController::class);
 });

@@ -2,7 +2,10 @@
 
 import { useParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
-import { getDepartmentById } from "@/lib/Actions/departments/departments";
+import {
+  getDepartmentById,
+  getDepartmentFormData,
+} from "@/lib/Actions/departments/departments";
 import { DepartmentForm } from "./department";
 import { Button } from "@/components/ui/button";
 import { FormLoadingSkeleton } from "@/components/shared/skeleton/formLoadingSkeleton";
@@ -12,7 +15,7 @@ export default function EditDepartmentWrapper() {
   const id = Number(params?.id);
   const { data, isLoading, isError, error, refetch } = useQuery({
     queryKey: ["department", id],
-    queryFn: () => getDepartmentById(id),
+    queryFn: () => getDepartmentFormData(id),
   });
 
   if (isLoading) return <FormLoadingSkeleton fields={5} />;
@@ -28,10 +31,6 @@ export default function EditDepartmentWrapper() {
     );
 
   return (
-    <DepartmentForm
-      mode="update"
-      departmentId={id}
-      defaultValues={data?.data}
-    />
+    <DepartmentForm mode="update" departmentId={id} formData={data?.data} />
   );
 }

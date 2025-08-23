@@ -1,5 +1,5 @@
 import { Meta } from "./api";
-
+import { User } from "./user";
 export type Department = {
   dId: number;
   code: string;
@@ -53,4 +53,10 @@ export type departmentUpdateData = Partial<
 > & {
   parentDepartment?: string | null;
   manager?: string | null;
+};
+
+export type DepartmentEditFormData = {
+  editingDepartment: Department;
+  departments: Department[];
+  managers: User[];
 };

@@ -4,6 +4,7 @@ import {
   Department,
   departmentCreateData,
   departmentUpdateData,
+  DepartmentEditFormData,
 } from "@/lib/Types/department";
 import { User } from "@/lib/Types/user";
 import { handleServiceError } from "@/lib/utils/errorHandler";
@@ -28,15 +29,12 @@ export const getDepartments = async (
 };
 
 export const getDepartmentFormData = async (
-  excludeDepartmentId?: number
-): Promise<ApiResponse<{ departments: Department[]; managers: User[] }>> => {
+  departmentId?: number
+): Promise<ApiResponse<DepartmentEditFormData>> => {
   try {
-    const queryParams = excludeDepartmentId
-      ? `?exclude_department_id=${excludeDepartmentId}`
-      : "";
-    const response = await api.get<
-      ApiResponse<{ departments: Department[]; managers: User[] }>
-    >(`${DEPARTMENTS_ENDPOINT}/form-data${queryParams}`);
+    const response = await api.get<ApiResponse<DepartmentEditFormData>>(
+      `${DEPARTMENTS_ENDPOINT}/${departmentId}/form-data`
+    );
     if (!response.data) throw new Error("No data received");
     return response;
   } catch (error) {

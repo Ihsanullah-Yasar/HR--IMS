@@ -11,26 +11,20 @@ return new class extends Migration {
     {
         Schema::create('departments', function (Blueprint $table) {
             $table->id('d_id');
-            $table->foreignId('parent_department_id')->nullable();
+            $table->foreignId('parent_department_id')->nullable()->constrained('departments')->nullOnDelete();
             $table->string('code', 20)->unique();
-            $table->string('name'); // Multi-language department name
-            $table->foreignId('manager_id')->nullable(); // FK to employees
+            $table->string('name'); // consider normalized translations table
+            $table->foreignId('manager_id')->nullable()->constrained('employees')->nullOnDelete();
             $table->string('timezone', 50)->default('UTC');
 
-            // Audit columns
-            $table->foreignId('created_by')->nullable();
-            $table->foreignId('updated_by')->nullable();
-            $table->foreignId('deleted_by')->nullable();
+            // Audit
+            $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->foreignId('deleted_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();
             $table->softDeletes();
-        });
 
-        Schema::table('departments', function (Blueprint $table) {
-
-            $table->foreign('parent_department_id')
-                ->references('d_id')
-                ->on('departments')
-                ->onDelete('set null');
+            $table->index('parent_id'); // for hierarchy queries
             $table->comment('Department hierarchy with timezone support');
         });
     }

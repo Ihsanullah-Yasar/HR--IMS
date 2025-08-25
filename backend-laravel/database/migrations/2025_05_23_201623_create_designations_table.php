@@ -12,19 +12,22 @@ return new class extends Migration
     public function up()
     {
         Schema::create('designations', function (Blueprint $table) {
-            $table->id('d_id');
+            $table->id('dn_id');
             $table->foreignId('department_id');
             $table->string('code', 20)->unique();
             $table->jsonb('title');
             $table->decimal('base_salary', 12, 2);
+            $table->boolean('is_active')->default(true);
             $table->foreignId('created_by')->nullable();
             $table->timestamps();
             $table->softDeletes();
 
-            $table->foreign('department_id')
-                ->references('d_id')
-                ->on('departments')
-                ->onDelete('cascade');
+            $table->foreignId('department_id')->constrained('departments')->cascadeOnDelete();
+            $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
+            // Indexes
+            $table->index('department_id');
+            $table->index(['department_id', 'is_active']);
+            $table->index('code');
         });
     }
 

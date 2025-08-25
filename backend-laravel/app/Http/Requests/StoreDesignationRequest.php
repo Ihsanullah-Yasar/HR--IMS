@@ -11,7 +11,7 @@ class StoreDesignationRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +22,11 @@ class StoreDesignationRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'department_id' => 'required|exists:departments,d_id',
+            'code' => 'required|string|max:20|unique:designations,code',
+            'title' => 'required|array',
+            'base_salary' => 'required|numeric|min:0',
+            'is_active' => 'boolean',
         ];
     }
 }

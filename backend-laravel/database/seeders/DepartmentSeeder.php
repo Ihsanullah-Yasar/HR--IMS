@@ -2,17 +2,17 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\Department;
 
 class DepartmentSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
-        Department::factory()->count(20)->create();
+        Department::factory()->create(['code' => 'DEPT-HR', 'name' => 'Human Resources']);
+        Department::factory()->create(['code' => 'DEPT-IT', 'name' => 'Information Technology']);
+        Department::factory()->create(['code' => 'DEPT-FIN', 'name' => 'Finance']);
+        Department::factory()->create(['code' => 'DEPT-SALES', 'name' => 'Sales']);
+        Department::factory()->create(['code' => 'DEPT-MKT', 'name' => 'Marketing']);
     }
 }

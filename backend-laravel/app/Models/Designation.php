@@ -12,7 +12,6 @@ class Designation extends Model
     /** @use HasFactory<\Database\Factories\DesignationFactory> */
     use HasFactory, SoftDeletes;
 
-    protected $primaryKey = 'dn_id';
 
     protected $fillable = [
         'department_id',
@@ -20,7 +19,7 @@ class Designation extends Model
         'title',
         'base_salary',
         'is_active',
-        'created_by',
+        'created_by'
     ];
 
     protected $casts = [

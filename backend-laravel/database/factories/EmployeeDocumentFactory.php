@@ -2,22 +2,19 @@
 
 namespace Database\Factories;
 
+use App\Models\Employee;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-/**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\EmployeeDocument>
- */
 class EmployeeDocumentFactory extends Factory
 {
-    /**
-     * Define the model's default state.
-     *
-     * @return array<string, mixed>
-     */
     public function definition(): array
     {
         return [
-            //
+            'employee_id' => Employee::factory(),
+            'type' => $this->faker->randomElement(['contract', 'id_proof', 'certificate']),
+            'path' => 'docs/' . $this->faker->uuid() . '.pdf',
+            'expiry_date' => $this->faker->boolean(50) ? $this->faker->dateTimeBetween('now', '+5 years') : null,
+            'metadata' => json_encode(['issuer' => $this->faker->company()]),
         ];
     }
 }

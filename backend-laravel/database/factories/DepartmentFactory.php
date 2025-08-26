@@ -20,7 +20,6 @@ class DepartmentFactory extends Factory
             'parent_department_id' => null,
             'code' => strtoupper($this->faker->unique()->bothify('DEPT-###')),
             'name' => $this->faker->unique()->company(),
-            'manager_id' => null,
             'timezone' => $this->faker->timezone(),
             'created_by' => null,
             'updated_by' => null,

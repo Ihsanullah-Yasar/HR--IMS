@@ -10,7 +10,7 @@ return new class extends Migration {
     public function up()
     {
         Schema::create('departments', function (Blueprint $table) {
-            $table->id('d_id');
+            $table->id();
             $table->foreignId('parent_department_id')->nullable()->constrained('departments')->nullOnDelete();
             $table->string('code', 20)->unique();
             $table->string('name'); // consider normalized translations table

@@ -3,13 +3,8 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Str;
 
-return new class extends Migration
-{
-    /**
-     * Run the migrations.
-     */
+return new class extends Migration {
     public function up(): void
     {
         Schema::create('users', function (Blueprint $table) {
@@ -22,21 +17,21 @@ return new class extends Migration
             $table->string('timezone', 50)->default('UTC');
             $table->boolean('consent_given')->default(false);
             $table->timestamp('data_retention_until')->nullable();
-            // Audit columns
-            $table->foreignId('created_by')->nullable();
-            $table->foreignId('updated_by')->nullable();
-            $table->foreignId('deleted_by')->nullable();
+
+            // Audit
+            $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->foreignId('deleted_by')->nullable()->constrained('users')->nullOnDelete();
+
             $table->rememberToken();
             $table->timestamps();
             $table->softDeletes();
-            $table->foreignId('department_id')->nullable()->constrained('departments', 'd_id')->onDelete('set null');
-        });
-        Schema::table('users', function (Blueprint $table) {
-            $table->foreign('created_by')->references('id')->on('users')->onDelete('set null');
+
             $table->comment('Base authentication table with GDPR compliance');
         });
+
         Schema::create('password_reset_tokens', function (Blueprint $table) {
-            $table->string('email')->primary();
+            $table->string('email')->index();
             $table->string('token');
             $table->timestamp('created_at')->nullable();
         });
@@ -51,9 +46,6 @@ return new class extends Migration
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('users');

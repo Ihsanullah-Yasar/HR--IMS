@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\Models\Api\Department;
+use App\Models\Department;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -45,7 +45,7 @@ class User extends Authenticatable
      */
     public function department()
     {
-        return $this->belongsTo(Department::class, 'department_id', 'd_id');
+        return $this->belongsTo(Department::class);
     }
 
     /**
@@ -53,7 +53,7 @@ class User extends Authenticatable
      */
     public function managedDepartment()
     {
-        return $this->hasOne(Department::class, 'manager_id', 'id');
+        return $this->hasOne(Department::class,);
     }
 
     /**

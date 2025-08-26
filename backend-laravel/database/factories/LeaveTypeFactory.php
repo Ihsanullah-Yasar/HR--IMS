@@ -2,22 +2,20 @@
 
 namespace Database\Factories;
 
+use App\Models\LeaveType;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-/**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\LeaveType>
- */
 class LeaveTypeFactory extends Factory
 {
-    /**
-     * Define the model's default state.
-     *
-     * @return array<string, mixed>
-     */
+    protected $model = LeaveType::class;
+
     public function definition(): array
     {
         return [
-            //
+            'code' => strtoupper($this->faker->unique()->lexify('LT-???')),
+            'name' => ['en' => $this->faker->word() . ' leave'],
+            'days_per_year' => $this->faker->numberBetween(5, 30),
+            'is_paid' => $this->faker->boolean(80),
         ];
     }
 }

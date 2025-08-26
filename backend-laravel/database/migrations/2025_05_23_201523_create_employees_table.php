@@ -3,15 +3,14 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
 
-// Core employee master data table
 return new class extends Migration {
     public function up()
     {
         Schema::create('employees', function (Blueprint $table) {
             $table->id();
-            $table->string('name'); // Multi-language first name
+            $table->string('name');
             $table->string('gender_type')->nullable();
             $table->string('marital_status')->nullable();
             $table->date('date_of_birth');
@@ -31,15 +30,17 @@ return new class extends Migration {
             // Foreign keys
             $table->foreignId('user_id')->nullable()->unique()->constrained('users')->nullOnDelete();
             $table->foreignId('department_id')->constrained('departments')->cascadeOnDelete();
-            $table->foreignId('department_id')->constrained('departments')->cascadeOnDelete();
             $table->foreignId('designation_id')->constrained('designations')->restrictOnDelete();
+
+            // Indexes
             $table->index(['department_id', 'date_of_joining']);
-            $table->comment('GDPR-compliant employee master data');
-            //logical constraints
-            $table->check('date_of_leaving IS NULL OR date_of_leaving >= date_of_joining');
-            $table->check('date_of_birth < date_of_joining');
             $table->index('data_retention_until');
+            $table->comment('GDPR-compliant employee master data');
         });
+
+        // Add CHECK constraints manually via SQL
+        DB::statement("ALTER TABLE employees ADD CONSTRAINT chk_leaving_after_join CHECK (date_of_leaving IS NULL OR date_of_leaving >= date_of_joining)");
+        DB::statement("ALTER TABLE employees ADD CONSTRAINT chk_birth_before_join CHECK (date_of_birth < date_of_joining)");
     }
 
     public function down()

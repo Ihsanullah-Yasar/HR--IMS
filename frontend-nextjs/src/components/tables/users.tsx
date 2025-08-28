@@ -13,7 +13,7 @@ import { ApiResponse, Meta } from "@/lib/Types/api";
 import { toast } from "sonner";
 import { useRouter, useSearchParams } from "next/navigation";
 import { DeleteAlertDialog } from "@/components/ui/delete-alert-dialog";
-import { UserTableLoadingSkeleton } from "../shared/skeleton/tableSkeleton";
+import { TableLoadingSkeleton } from "../shared/skeleton/tableSkeleton";
 import { userFilterConfig, userSortOptions } from "../filterConfigs/users";
 import DynamicTableFilters from "../table-filters";
 
@@ -46,7 +46,7 @@ export default function UserTable() {
   });
 
   if (isLoading) {
-    return <UserTableLoadingSkeleton columns={4} rows={10} />;
+    return <TableLoadingSkeleton columns={4} rows={10} />;
   }
 
   if (isError) {

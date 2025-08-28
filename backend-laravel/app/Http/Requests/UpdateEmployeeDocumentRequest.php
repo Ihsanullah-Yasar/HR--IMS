@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rules\File;
 
 class UpdateEmployeeDocumentRequest extends FormRequest
 {
@@ -11,7 +12,7 @@ class UpdateEmployeeDocumentRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +23,15 @@ class UpdateEmployeeDocumentRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'employee_id' => 'sometimes|exists:employees,id',
+            'type' => 'sometimes|string|max:100',
+            'document' => [
+                'sometimes',
+                File::types(['pdf','jpg','jpeg','png','doc','docx'])
+                    ->max(10 * 1024), // 10 MB
+            ],
+            'expiry_date' => 'sometimes|nullable|date|after:today',
+            'metadata' => 'sometimes|nullable|array',
         ];
     }
 }

@@ -19,7 +19,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { DataTablePagination } from "@/components/ui/datatable-pagination";
 import { Meta } from "@/lib/Types/api";
-import TableFilter from "../table-filters";
 
 import { Dispatch, SetStateAction } from "react";
 

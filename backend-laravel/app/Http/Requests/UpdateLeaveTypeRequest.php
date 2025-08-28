@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateLeaveTypeRequest extends FormRequest
 {
@@ -11,7 +12,7 @@ class UpdateLeaveTypeRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +23,16 @@ class UpdateLeaveTypeRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'name' => [
+                'sometimes',
+                'string',
+                'max:100',
+                Rule::unique('leave_types', 'name')->ignore($this->leave_type->id),
+            ],
+            'description' => 'sometimes|nullable|string|max:500',
+            'default_days' => 'sometimes|numeric|min:0',
+            'is_active' => 'sometimes|boolean',
+            'color' => 'sometimes|nullable|string|max:7|regex:/^#[0-9A-F]{6}$/i',
         ];
     }
 }

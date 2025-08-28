@@ -11,7 +11,7 @@ class UpdateLeaveRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +22,13 @@ class UpdateLeaveRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'employee_id' => 'sometimes|exists:employees,id',
+            'leave_type_id' => 'sometimes|exists:leave_types,id',
+            'start_date' => 'sometimes|date|after_or_equal:today',
+            'end_date' => 'sometimes|date|after_or_equal:start_date',
+            'total_days' => 'sometimes|nullable|numeric|min:0.5',
+            'reason' => 'sometimes|string|max:1000',
+            'status' => 'sometimes|string|in:pending,approved,rejected,cancelled',
         ];
     }
 }

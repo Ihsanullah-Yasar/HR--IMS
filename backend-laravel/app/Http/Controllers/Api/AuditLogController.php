@@ -1,50 +1,58 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api;
 
 use App\Models\AuditLog;
-use App\Http\Requests\StoreAuditLogRequest;
-use App\Http\Requests\UpdateAuditLogRequest;
+use Illuminate\Http\JsonResponse;
+use App\Http\Resources\AuditLogResource;
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+use Spatie\QueryBuilder\AllowedFilter;
+use Spatie\QueryBuilder\QueryBuilder;
+use App\Traits\ApiResponseTrait;
 
 class AuditLogController extends Controller
 {
+    use ApiResponseTrait;
+
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request): JsonResponse
     {
-        //
-    }
+        $auditLogs = QueryBuilder::for(AuditLog::query())
+            ->with(['user'])
+            ->allowedFilters([
+                AllowedFilter::exact('user_id'),
+                AllowedFilter::partial('user.name'),
+                AllowedFilter::partial('action'),
+                AllowedFilter::partial('table_name'),
+                AllowedFilter::partial('record_id'),
+                AllowedFilter::scope('date_range'),
+            ])
+            ->allowedSorts(['created_at', 'action', 'table_name'])
+            ->paginate($request->input('per_page', 15));
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(StoreAuditLogRequest $request)
-    {
-        //
+        $resource = AuditLogResource::collection($auditLogs);
+        $array = $resource->response()->getData(true);
+
+        return response()->json([
+            'status' => 'success',
+            'data'   => $array['data'],
+            'links'  => $array['links'] ?? null,
+            'meta'   => $array['meta'] ?? null,
+        ]);
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(AuditLog $auditLog)
+    public function show(AuditLog $auditLog): JsonResponse
     {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(UpdateAuditLogRequest $request, AuditLog $auditLog)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(AuditLog $auditLog)
-    {
-        //
+        $auditLog->load('user');
+        return $this->successResponse(
+            new AuditLogResource($auditLog),
+            'Audit log retrieved successfully'
+        );
     }
 }

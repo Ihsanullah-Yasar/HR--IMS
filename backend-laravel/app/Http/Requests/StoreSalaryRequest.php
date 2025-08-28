@@ -11,7 +11,7 @@ class StoreSalaryRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +22,15 @@ class StoreSalaryRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'employee_id' => 'required|exists:employees,id',
+            'currency_code' => 'required|exists:currencies,code',
+            'base_amount' => 'required|numeric|min:0',
+            'components' => 'nullable|array',
+            'components.*.name' => 'required_with:components|string|max:100',
+            'components.*.amount' => 'required_with:components|numeric|min:0',
+            'components.*.type' => 'required_with:components|string|in:allowance,deduction',
+            'effective_from' => 'required|date',
+            'effective_to' => 'nullable|date|after:effective_from',
         ];
     }
 }

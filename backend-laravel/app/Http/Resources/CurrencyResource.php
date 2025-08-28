@@ -14,6 +14,15 @@ class CurrencyResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        return parent::toArray($request);
+        return [
+            'id' => $this->id,
+            'name' => $this->name,
+            'code' => $this->code,
+            'symbol' => $this->symbol,
+            'exchange_rate' => $this->exchange_rate,
+            'is_active' => $this->is_active,
+            'created_at' => $this->created_at?->toISOString(),
+            'updated_at' => $this->updated_at?->toISOString(),
+        ];
     }
 }

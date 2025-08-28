@@ -11,7 +11,7 @@ class StoreLeaveRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +22,13 @@ class StoreLeaveRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'employee_id' => 'required|exists:employees,id',
+            'leave_type_id' => 'required|exists:leave_types,id',
+            'start_date' => 'required|date|after_or_equal:today',
+            'end_date' => 'required|date|after_or_equal:start_date',
+            'total_days' => 'nullable|numeric|min:0.5',
+            'reason' => 'required|string|max:1000',
+            'status' => 'nullable|string|in:pending,approved,rejected,cancelled',
         ];
     }
 }

@@ -3,6 +3,14 @@
 use App\Http\Controllers\Api\DepartmentController;
 use App\Http\Controllers\Api\EmployeeDocumentController;
 use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\Api\EmployeeController;
+use App\Http\Controllers\Api\DesignationController;
+use App\Http\Controllers\Api\AttendanceRecordController;
+use App\Http\Controllers\Api\LeaveController;
+use App\Http\Controllers\Api\LeaveTypeController;
+use App\Http\Controllers\Api\SalaryController;
+use App\Http\Controllers\Api\CurrencyController;
+use App\Http\Controllers\Api\AuditLogController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -17,8 +25,37 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::middleware('api')->group(function () {
+    // User Management
     Route::apiResource('users', UserController::class);
-    Route::apiResource('employee-documents', EmployeeDocumentController::class);
-    Route::get('/departments/{id}/form-data', [DepartmentController::class, 'formData'])->whereNumber('id');
+    
+    // Department Management
     Route::apiResource('departments', DepartmentController::class);
+    Route::get('/departments/{id}/form-data', [DepartmentController::class, 'formData'])->whereNumber('id');
+    
+    // Employee Management
+    Route::apiResource('employees', EmployeeController::class);
+    Route::get('/employees/{id}/form-data', [EmployeeController::class, 'formData'])->whereNumber('id');
+    
+    // Employee Documents
+    Route::apiResource('employee-documents', EmployeeDocumentController::class);
+    
+    // Designation Management
+    Route::apiResource('designations', DesignationController::class);
+    Route::get('/designations/{id}/form-data', [DesignationController::class, 'formData'])->whereNumber('id');
+    
+    // Attendance Management
+    Route::apiResource('attendance-records', AttendanceRecordController::class);
+    
+    // Leave Management
+    Route::apiResource('leaves', LeaveController::class);
+    Route::apiResource('leave-types', LeaveTypeController::class);
+    
+    // Salary Management
+    Route::apiResource('salaries', SalaryController::class);
+    
+    // Currency Management
+    Route::apiResource('currencies', CurrencyController::class);
+    
+    // Audit Logs (Read-only)
+    Route::apiResource('audit-logs', AuditLogController::class)->only(['index', 'show']);
 });

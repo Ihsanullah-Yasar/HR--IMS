@@ -33,7 +33,7 @@ class Designation extends Model
      */
     public function department(): BelongsTo
     {
-        return $this->belongsTo(Department::class, 'department_id', 'd_id');
+        return $this->belongsTo(Department::class, 'department_id', 'id');
     }
 
     /**

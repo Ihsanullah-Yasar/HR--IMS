@@ -58,7 +58,7 @@ class DesignationController extends Controller
     {
         $data = [
             'editingDesignation' => new DesignationResource(Designation::findOrFail($id)),
-            'departments' => Department::select('d_id', 'name', 'code')
+            'departments' => Department::select('id', 'name', 'code')
                 ->orderBy('name')
                 ->get()
         ];

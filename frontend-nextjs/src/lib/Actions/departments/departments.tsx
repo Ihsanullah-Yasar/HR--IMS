@@ -32,6 +32,9 @@ export const getDepartmentFormData = async (
   departmentId?: number
 ): Promise<ApiResponse<DepartmentEditFormData>> => {
   try {
+    if (!Number.isFinite(departmentId) || (departmentId as number) <= 0) {
+      throw new Error("Invalid department id");
+    }
     const response = await api.get<ApiResponse<DepartmentEditFormData>>(
       `${DEPARTMENTS_ENDPOINT}/${departmentId}/form-data`
     );
@@ -61,12 +64,15 @@ export const createDepartment = async (
 ): Promise<ApiResponse<Department>> => {
   try {
     // Transform frontend field names to backend field names
-    const transformedData = {
+    const parentDeptValue = parseInt(departmentData.parentDepartment ?? "");
+    const managerValue = parseInt(departmentData.manager ?? "");
+
+    const transformedData: Record<string, any> = {
       code: departmentData.code,
       name: departmentData.name,
       timezone: departmentData.timezone,
-      parent_department_id: departmentData.parentDepartment || null,
-      manager_id: departmentData.manager || null, // Use selected manager
+      parent_department_id: !isNaN(parentDeptValue) ? parentDeptValue : null,
+      manager_employee_id: !isNaN(managerValue) ? managerValue : null,
     };
 
     const response = await api.post<ApiResponse<Department>>(
@@ -102,7 +108,7 @@ export const updateDepartment = async (
 
     const managerValue = parseInt(departmentData.manager ?? "");
     if (!isNaN(managerValue)) {
-      transformedData.manager_id = managerValue;
+      transformedData.manager_employee_id = managerValue;
     }
     console.log("Transformed data : ", transformedData);
     const response = await api.put<ApiResponse<Department>>(

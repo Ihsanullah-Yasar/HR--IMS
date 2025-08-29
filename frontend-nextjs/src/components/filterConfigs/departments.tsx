@@ -20,7 +20,7 @@ export const departmentFilterConfig: FilterConfig[] = [
   },
   {
     label: "Manager",
-    value: "manager.name",
+    value: "currentManager.employee.name",
     type: "text", // input box
   },
   //   {

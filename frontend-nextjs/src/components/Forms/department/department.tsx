@@ -24,7 +24,7 @@ import { createDepartment } from "@/lib/Actions/departments/departments";
 import { updateDepartment } from "@/lib/Actions/departments/departments";
 import { getDepartmentFormData } from "@/lib/Actions/departments/departments";
 import { Combobox } from "@/components/ui/combobox";
-import { User } from "@/lib/Types/user";
+import { Employee } from "@/lib/Types/employee";
 import React from "react";
 import { useCreateMutation } from "@/hooks/useCreateMutation";
 import { useUpdateMutation } from "@/hooks/useUpdateMutation";
@@ -56,7 +56,7 @@ export const DepartmentForm = ({
   // Transform departments data for combobox
   const departmentOptions = React.useMemo(() => {
     if (!formData?.departments) return [];
-    return formData.departments.map((dept: Department) => ({
+    return formData.departments.map((dept) => ({
       value: dept.dId.toString(),
       label: `${dept.code} - ${dept.name}`,
       searchValue: `${dept.code} ${dept.name}`.toLowerCase(), // Lowercase for better searching
@@ -66,11 +66,10 @@ export const DepartmentForm = ({
   // Transform managers data for combobox
   const managerOptions = React.useMemo(() => {
     if (!formData?.managers) return [];
-    return formData.managers.map((manager: User) => ({
+    return formData.managers.map((manager: Pick<Employee, "id" | "name">) => ({
       value: manager.id.toString(),
       label: manager.name,
       searchValue: manager.name.toLowerCase(),
-      email: manager.email, // Include email for additional context if needed
     }));
   }, [formData?.managers]);
 
@@ -106,8 +105,16 @@ export const DepartmentForm = ({
       code: defaultValues?.code || "",
       name: defaultValues?.name || "",
       timezone: defaultValues?.timezone || "UTC",
-      parentDepartment: defaultValues?.parentDepartment ?? null,
-      manager: defaultValues?.manager ?? null,
+      parentDepartment:
+        defaultValues?.parentDepartmentId !== undefined &&
+        defaultValues?.parentDepartmentId !== null
+          ? String(defaultValues.parentDepartmentId)
+          : null,
+      manager:
+        defaultValues?.managerEmployeeId !== undefined &&
+        defaultValues?.managerEmployeeId !== null
+          ? String(defaultValues.managerEmployeeId)
+          : null,
     },
     resolver: zodResolver(departmentSchema),
   });

@@ -15,14 +15,18 @@ class DepartmentResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'dId' => $this->d_id,
+            'dId' => $this->id,
             'code' => $this->code,
             'name' => $this->name,
             'timezone' => $this->timezone,
 
             // Relations as human-readable names
             'parentDepartment' => $this->parentDepartment?->name,
-            'manager' => $this->manager?->name,
+            'manager' => $this->currentManager?->employee?->name,
+
+            // Relation IDs for forms
+            'parentDepartmentId' => $this->parent_department_id,
+            'managerEmployeeId' => $this->currentManager?->employee_id,
 
             // Audit users as names
             'createdByUser' => $this->createdBy?->name,

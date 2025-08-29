@@ -12,11 +12,20 @@ import { FormLoadingSkeleton } from "@/components/shared/skeleton/formLoadingSke
 
 export default function EditDepartmentWrapper() {
   const params = useParams();
-  const id = Number(params?.id);
+  const rawId = (params as any)?.id as string | string[] | undefined;
+  const id = typeof rawId === "string" ? Number.parseInt(rawId, 10) : NaN;
   const { data, isLoading, isError, error, refetch } = useQuery({
     queryKey: ["department", id],
-    queryFn: () => getDepartmentFormData(id),
+    queryFn: () => getDepartmentFormData(id as number),
+    enabled: Number.isFinite(id) && id > 0,
   });
+
+  if (!Number.isFinite(id) || id <= 0)
+    return (
+      <div className="flex flex-col items-center align-center py-8">
+        <p className="text-red-500">Invalid department id in URL.</p>
+      </div>
+    );
 
   if (isLoading) return <FormLoadingSkeleton fields={5} />;
 

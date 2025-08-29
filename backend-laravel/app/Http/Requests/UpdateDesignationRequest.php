@@ -23,7 +23,7 @@ class UpdateDesignationRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'department_id' => 'sometimes|exists:departments,d_id',
+            'department_id' => 'sometimes|exists:departments,id',
             'code' => [
                 'sometimes',
                 'string',

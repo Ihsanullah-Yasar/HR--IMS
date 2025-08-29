@@ -63,7 +63,7 @@ class EmployeeController extends Controller
     {
         $data = [
             'editingEmployee' => new EmployeeResource(Employee::findOrFail($id)),
-            'departments' => Department::select('d_id', 'name', 'code')
+            'departments' => Department::select('id', 'name', 'code')
                 ->orderBy('name')
                 ->get(),
             'designations' => Designation::select('dn_id', 'code', 'title')

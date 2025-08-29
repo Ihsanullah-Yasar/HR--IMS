@@ -29,7 +29,7 @@ class UpdateDepartmentRequest extends FormRequest
                 'sometimes',
                 'string',
                 'max:20',
-                Rule::unique('departments', 'code')->ignore($departmentId, 'd_id'),
+                Rule::unique('departments', 'code')->ignore($departmentId, 'id'),
                 'regex:/^[A-Z0-9-]+$/',
             ],
             'name' => [
@@ -45,12 +45,12 @@ class UpdateDepartmentRequest extends FormRequest
             'parent_department_id' => [
                 'nullable',
                 'integer',
-                'exists:departments,d_id',
+                'exists:departments,id',
             ],
-            'manager_id' => [
+            'manager_employee_id' => [
                 'nullable',
                 'integer',
-                'exists:users,id',
+                'exists:employees,id',
             ],
         ];
     }
@@ -64,7 +64,7 @@ class UpdateDepartmentRequest extends FormRequest
             'code.unique' => 'This department code already exists.',
             'code.regex' => 'Department code must contain only uppercase letters, numbers, and hyphens.',
             'parent_department_id.exists' => 'Selected parent department does not exist.',
-            'manager_id.exists' => 'Selected manager does not exist.',
+            'manager_employee_id.exists' => 'Selected manager does not exist.',
         ];
     }
 }

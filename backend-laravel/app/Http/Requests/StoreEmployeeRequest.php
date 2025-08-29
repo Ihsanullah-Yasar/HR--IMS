@@ -32,7 +32,7 @@ class StoreEmployeeRequest extends FormRequest
             'consent_given' => 'boolean',
             'data_retention_until' => 'nullable|date|after:today',
             'user_id' => 'nullable|exists:users,id|unique:employees,user_id',
-            'department_id' => 'required|exists:departments,d_id',
+            'department_id' => 'required|exists:departments,id',
             'designation_id' => 'required|exists:designations,dn_id',
         ];
     }

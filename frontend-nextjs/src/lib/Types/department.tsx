@@ -1,5 +1,5 @@
 import { Meta } from "./api";
-import { User } from "./user";
+import { Employee } from "./employee";
 export type Department = {
   dId: number;
   code: string;
@@ -8,8 +8,10 @@ export type Department = {
 
   // Relations
   parentDepartment?: string | null;
+  parentDepartmentId?: number | null;
 
   manager?: string | null;
+  managerEmployeeId?: number | null;
 
   // Audit relations (optional)
   createdByUser?: string | null;
@@ -57,6 +59,6 @@ export type departmentUpdateData = Partial<
 
 export type DepartmentEditFormData = {
   editingDepartment: Department;
-  departments: Department[];
-  managers: User[];
+  departments: Pick<Department, "dId" | "code" | "name">[];
+  managers: Pick<Employee, "id" | "name">[];
 };

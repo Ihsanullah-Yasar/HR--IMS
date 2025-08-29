@@ -22,7 +22,7 @@ class StoreDesignationRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'department_id' => 'required|exists:departments,d_id',
+            'department_id' => 'required|exists:departments,id',
             'code' => 'required|string|max:20|unique:designations,code',
             'title' => 'required|array',
             'base_salary' => 'required|numeric|min:0',

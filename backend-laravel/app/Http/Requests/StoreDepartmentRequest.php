@@ -42,11 +42,11 @@ class StoreDepartmentRequest extends FormRequest
             ],
             'parent_department_id' => [
                 'nullable',
-                'exists:departments,d_id',
+                'exists:departments,id',
             ],
-            'manager_id' => [
+            'manager_employee_id' => [
                 'nullable',
-                'exists:users,id',
+                'exists:employees,id',
             ],
         ];
     }
@@ -62,7 +62,7 @@ class StoreDepartmentRequest extends FormRequest
             'code.regex' => 'Department code must contain only uppercase letters, numbers, and hyphens.',
             'name.required' => 'Department name is required.',
             'parent_department_id.exists' => 'Selected parent department does not exist.',
-            'manager_id.exists' => 'Selected manager does not exist.',
+            'manager_employee_id.exists' => 'Selected manager does not exist.',
         ];
     }
 }

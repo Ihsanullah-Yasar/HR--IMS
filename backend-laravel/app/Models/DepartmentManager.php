@@ -16,4 +16,14 @@ class DepartmentManager extends Model
         'end_date',
         'is_active'
     ];
+
+    public function department()
+    {
+        return $this->belongsTo(Department::class);
+    }
+
+    public function employee()
+    {
+        return $this->belongsTo(Employee::class);
+    }
 }

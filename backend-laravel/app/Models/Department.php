@@ -26,7 +26,7 @@ class Department extends Model
      */
     public function users()
     {
-        return $this->hasMany(User::class, 'department_id', 'd_id');
+        return $this->hasMany(User::class, 'department_id', 'id');
     }
 
     /**
@@ -42,7 +42,16 @@ class Department extends Model
      */
     public function parentDepartment()
     {
-        return $this->belongsTo(Department::class, 'parent_department_id', 'd_id');
+        return $this->belongsTo(Department::class, 'parent_department_id', 'id');
+    }
+
+    /**
+     * 🔹 Active manager relationship via DepartmentManager
+     */
+    public function currentManager()
+    {
+        return $this->hasOne(DepartmentManager::class, 'department_id')
+            ->where('is_active', true);
     }
 
     /**
@@ -50,7 +59,7 @@ class Department extends Model
      */
     public function childDepartments()
     {
-        return $this->hasMany(Department::class, 'parent_department_id', 'd_id');
+        return $this->hasMany(Department::class, 'parent_department_id', 'id');
     }
 
     /**

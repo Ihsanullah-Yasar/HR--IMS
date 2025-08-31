@@ -4,7 +4,7 @@ import type { FilterConfig, SortOption } from "../table-filters";
 export const designationSortOptions: SortOption[] = [
   { label: "Title", value: "title" },
   { label: "Code", value: "code" },
-  { label: "Department", value: "department" },
+  { label: "Department", value: "department.name" },
   { label: "Base Salary", value: "base_salary" },
   { label: "Creation Date", value: "created_at" },
 ];
@@ -22,7 +22,7 @@ export const designationFilterConfig: FilterConfig[] = [
   },
   {
     label: "Department",
-    value: "department",
+    value: "department.name",
     type: "text",
   },
   {
@@ -33,15 +33,5 @@ export const designationFilterConfig: FilterConfig[] = [
       { label: "Active", value: "true" },
       { label: "Inactive", value: "false" },
     ],
-  },
-  {
-    label: "Base Salary Range",
-    value: "base_salary",
-    type: "range",
-  },
-  {
-    label: "Creation Date",
-    value: "created_at",
-    type: "date",
   },
 ];

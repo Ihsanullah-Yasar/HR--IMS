@@ -12,7 +12,6 @@ class Designation extends Model
     /** @use HasFactory<\Database\Factories\DesignationFactory> */
     use HasFactory, SoftDeletes;
 
-
     protected $fillable = [
         'department_id',
         'code',

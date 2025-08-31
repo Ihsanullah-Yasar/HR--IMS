@@ -15,7 +15,7 @@ class DesignationResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'dn_id' => $this->dn_id,
+            'id' => $this->id,
             'departmentId' => $this->department_id,
             'code' => $this->code,
             'title' => $this->title,
@@ -26,9 +26,9 @@ class DesignationResource extends JsonResource
             'updatedAt' => $this->updated_at,
             'deletedAt' => $this->deleted_at,
             'department' => $this->whenLoaded('department'),
-            'createdByBser' => $this->whenLoaded('createdBy'),
+            'createdByUser' => $this->whenLoaded('createdBy'),
             'updatedByUser' => $this->whenLoaded('updatedBy'),
-            'deletedByUer' => $this->whenLoaded('deletedBy'),
+            'deletedByUser' => $this->whenLoaded('deletedBy'),
         ];
     }
 }

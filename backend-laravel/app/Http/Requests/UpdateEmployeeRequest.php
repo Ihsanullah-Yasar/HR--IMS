@@ -39,7 +39,7 @@ class UpdateEmployeeRequest extends FormRequest
                 Rule::unique('employees', 'user_id')->ignore($this->employee->id),
             ],
             'department_id' => 'sometimes|exists:departments,id',
-            'designation_id' => 'sometimes|exists:designations,dn_id',
+            'designation_id' => 'sometimes|exists:designations,id',
         ];
     }
 }

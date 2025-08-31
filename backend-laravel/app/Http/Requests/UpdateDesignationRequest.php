@@ -24,12 +24,7 @@ class UpdateDesignationRequest extends FormRequest
     {
         return [
             'department_id' => 'sometimes|exists:departments,id',
-            'code' => [
-                'sometimes',
-                'string',
-                'max:20',
-                Rule::unique('designations', 'code')->ignore($this->designation->dn_id, 'dn_id'),
-            ],
+            'code' => ['sometimes', 'string', 'max:20', Rule::unique('designations', 'code')->ignore($this->designation->id, 'id')],
             'title' => 'sometimes|array',
             'base_salary' => 'sometimes|numeric|min:0',
             'is_active' => 'sometimes|boolean',

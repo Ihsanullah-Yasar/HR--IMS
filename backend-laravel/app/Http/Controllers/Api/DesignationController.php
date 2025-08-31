@@ -13,6 +13,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Http\Request;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
+use Spatie\QueryBuilder\AllowedSort;
 use App\Traits\ApiResponseTrait;
 
 class DesignationController extends Controller
@@ -33,8 +34,9 @@ class DesignationController extends Controller
                 AllowedFilter::partial('code'),
                 AllowedFilter::partial('title'),
                 AllowedFilter::partial('department.name'),
+                AllowedFilter::exact('is_active'),
             ])
-            ->allowedSorts(['code', 'base_salary', 'created_at'])
+            ->allowedSorts(['title','code', 'base_salary', 'created_at',AllowedSort::relation('department', 'name')])
             ->paginate($request->input('per_page', 15));
 
         $resource = DesignationResource::collection($designations);

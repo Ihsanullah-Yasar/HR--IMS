@@ -66,7 +66,7 @@ class EmployeeController extends Controller
             'departments' => Department::select('id', 'name', 'code')
                 ->orderBy('name')
                 ->get(),
-            'designations' => Designation::select('dn_id', 'code', 'title')
+            'designations' => Designation::select('id', 'code', 'title')
                 ->orderBy('code')
                 ->get(),
             'users' => User::select('id', 'name', 'email')

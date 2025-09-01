@@ -15,11 +15,11 @@ use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\QueryBuilder\AllowedSort;
 use App\Traits\ApiResponseTrait;
+use App\QueryBuilder\Sorts\RelationSort;
 
 class DesignationController extends Controller
 {
     use ApiResponseTrait;
-
     /**
      * Display a listing of the resource.
      *
@@ -36,14 +36,14 @@ class DesignationController extends Controller
                 AllowedFilter::partial('department.name'),
                 AllowedFilter::exact('is_active'),
             ])
-            ->allowedSorts(['title','code', 'base_salary', 'created_at',AllowedSort::relation('department', 'name')])
+            ->allowedSorts(['title','code', 'base_salary', 'created_at',
+             AllowedSort::custom('department.name', new RelationSort('department', 'name')),])
             ->paginate($request->input('per_page', 15));
 
         $resource = DesignationResource::collection($designations);
         $array = $resource->response()->getData(true);
 
-        return response()->json([
-            'status' => 'success',
+        return $this->successResponse([
             'data'   => $array['data'],
             'links'  => $array['links'] ?? null,
             'meta'   => $array['meta'] ?? null,
@@ -65,10 +65,7 @@ class DesignationController extends Controller
                 ->get()
         ];
 
-        return response()->json([
-            'status' => 'success',
-            'data' => $data
-        ]);
+        return $this->successResponse($data);
     }
 
     /**

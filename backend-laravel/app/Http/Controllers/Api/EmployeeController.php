@@ -45,8 +45,7 @@ class EmployeeController extends Controller
         $resource = EmployeeResource::collection($employees);
         $array = $resource->response()->getData(true);
 
-        return response()->json([
-            'status' => 'success',
+        return $this->successResponse([
             'data'   => $array['data'],
             'links'  => $array['links'] ?? null,
             'meta'   => $array['meta'] ?? null,
@@ -74,10 +73,7 @@ class EmployeeController extends Controller
                 ->get()
         ];
 
-        return response()->json([
-            'status' => 'success',
-            'data' => $data
-        ]);
+        return $this->successResponse($data);
     }
 
     /**

@@ -37,8 +37,7 @@ class SalaryController extends Controller
         $resource = SalaryResource::collection($salaries);
         $array = $resource->response()->getData(true);
 
-        return response()->json([
-            'status' => 'success',
+        return $this->successResponse([
             'data'   => $array['data'],
             'links'  => $array['links'] ?? null,
             'meta'   => $array['meta'] ?? null,

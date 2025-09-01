@@ -41,8 +41,7 @@ class DepartmentController extends Controller
         $resource = DepartmentResource::collection($departments);
         $array = $resource->response()->getData(true);
 
-        return response()->json([
-            'status' => 'success',
+        return $this->successResponse([
             'data'   => $array['data'],
             'links'  => $array['links'] ?? null,
             'meta'   => $array['meta'] ?? null,
@@ -71,10 +70,7 @@ class DepartmentController extends Controller
                 ->get()
         ];
 
-        return response()->json([
-            'status' => 'success',
-            'data' => $data
-        ]);
+        return $this->successResponse($data);
     }
     /**
      * Store a newly created resource in storage.

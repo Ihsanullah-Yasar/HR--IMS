@@ -36,8 +36,7 @@ class AttendanceRecordController extends Controller
         $resource = AttendanceRecordResource::collection($attendanceRecords);
         $array = $resource->response()->getData(true);
 
-        return response()->json([
-            'status' => 'success',
+        return $this->successResponse([
             'data'   => $array['data'],
             'links'  => $array['links'] ?? null,
             'meta'   => $array['meta'] ?? null,

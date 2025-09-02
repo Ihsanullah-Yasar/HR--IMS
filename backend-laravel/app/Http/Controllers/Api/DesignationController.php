@@ -43,7 +43,8 @@ class DesignationController extends Controller
         $resource = DesignationResource::collection($designations);
         $array = $resource->response()->getData(true);
 
-        return $this->successResponse([
+        return response()->json([
+            'status' => 'success',
             'data'   => $array['data'],
             'links'  => $array['links'] ?? null,
             'meta'   => $array['meta'] ?? null,
@@ -56,11 +57,27 @@ class DesignationController extends Controller
      * @param Request $request
      * @return JsonResponse
      */
-    public function formData($id): JsonResponse
+    public function edit($id): JsonResponse
     {
         $data = [
             'editingDesignation' => new DesignationResource(Designation::findOrFail($id)),
-            'departments' => Department::select('id', 'name', 'code')
+            'departments' => Department::select('id as dId', 'name', 'code')
+                ->orderBy('name')
+                ->get()
+        ];
+
+        return $this->successResponse($data);
+    }
+
+    /**
+     * Get departments for designation creation form.
+     *
+     * @return JsonResponse
+     */
+    public function create(): JsonResponse
+    {
+        $data = [
+            'departments' => Department::select('id as dId', 'name', 'code')
                 ->orderBy('name')
                 ->get()
         ];

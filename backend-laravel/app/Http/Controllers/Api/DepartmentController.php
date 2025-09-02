@@ -54,12 +54,12 @@ class DepartmentController extends Controller
      * @param Request $request
      * @return JsonResponse
      */
-    public function formData($id): JsonResponse
+    public function edit($id): JsonResponse
     {
         // $excludeDepartmentId = $request->input('exclude_department_id');
         $data = [
             'editingDepartment' => new DepartmentResource(Department::findOrFail($id)),
-            'departments' => DepartmentResource::collection(Department::select('id', 'name', 'code')
+            'departments' => DepartmentResource::collection(Department::select('id as dId', 'name', 'code')
                 // ->when(is_numeric($excludeDepartmentId), function ($query) use ($excludeDepartmentId) {
                 //     return $query->where('id', '!=', (int) $excludeDepartmentId);
                 // })
@@ -72,6 +72,26 @@ class DepartmentController extends Controller
 
         return $this->successResponse($data);
     }
+
+    /**
+     * Get departments and managers for department creation form.
+     *
+     * @return JsonResponse
+     */
+    public function create(): JsonResponse
+    {
+        $data = [
+            'departments' => Department::select('id as dId', 'name', 'code')
+                ->orderBy('name')
+                ->get(),
+            'managers' => Employee::select('id', 'name')
+                ->orderBy('name')
+                ->get()
+        ];
+
+        return $this->successResponse($data);
+    }
+
     /**
      * Store a newly created resource in storage.
      *

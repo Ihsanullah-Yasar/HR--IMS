@@ -1,7 +1,7 @@
 "use client";
 import { DesignationForm } from "@/components/Forms/designation/designation";
 import { useQuery } from "@tanstack/react-query";
-import { getDesignationFormData } from "@/lib/Actions/designations/designations";
+import { getDesignationCreateFormData } from "@/lib/Actions/designations/designations";
 import { TableLoadingSkeleton } from "@/components/shared/skeleton/tableSkeleton";
 import { Button } from "@/components/ui/button";
 
@@ -13,8 +13,8 @@ export default function CreateDesignationPage() {
     isError,
     refetch,
   } = useQuery({
-    queryKey: ["designation-form-data"],
-    queryFn: () => getDesignationFormData(),
+    queryKey: ["designation-create-form-data"],
+    queryFn: () => getDesignationCreateFormData(),
     staleTime: 5 * 60 * 1000, // Cache for 5 minutes
   });
 

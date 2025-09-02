@@ -30,6 +30,7 @@ Route::middleware('api')->group(function () {
     
     // Department Management
     Route::apiResource('departments', DepartmentController::class);
+    Route::get('/departments/create/form-data', [DepartmentController::class, 'createFormData']);
     Route::get('/departments/{id}/form-data', [DepartmentController::class, 'formData'])->whereNumber('id');
     
     // Employee Management
@@ -41,7 +42,8 @@ Route::middleware('api')->group(function () {
     
     // Designation Management
     Route::apiResource('designations', DesignationController::class);
-    Route::get('/designations/{id}/form-data', [DesignationController::class, 'formData'])->whereNumber('id');
+    Route::get('/designations/create/form-data', [DesignationController::class, 'create']);
+    Route::get('/designations/{id}/form-data', [DesignationController::class, 'edit'])->whereNumber('id');
     
     // Attendance Management
     Route::apiResource('attendance-records', AttendanceRecordController::class);

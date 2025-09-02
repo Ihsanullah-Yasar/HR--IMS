@@ -44,6 +44,24 @@ export const getDesignationFormData = async (
   }
 };
 
+export const getDesignationCreateFormData = async (): Promise<
+  ApiResponse<{
+    departments: Array<{ dId: number; name: string; code: string }>;
+  }>
+> => {
+  try {
+    const response = await api.get<
+      ApiResponse<{
+        departments: Array<{ dId: number; name: string; code: string }>;
+      }>
+    >(`${DESIGNATIONS_ENDPOINT}/create/form-data`);
+    if (!response.data) throw new Error("No data received");
+    return response;
+  } catch (error) {
+    throw handleServiceError(error, "Unable to load form data");
+  }
+};
+
 export const getDesignationById = async (
   id: number
 ): Promise<ApiResponse<Designation>> => {

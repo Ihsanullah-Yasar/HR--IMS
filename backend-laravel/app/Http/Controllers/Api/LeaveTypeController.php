@@ -33,13 +33,8 @@ class LeaveTypeController extends Controller
             ->paginate($request->input('per_page', 15));
 
         $resource = LeaveTypeResource::collection($leaveTypes);
-        $array = $resource->response()->getData(true);
 
-        return $this->successResponse([
-            'data'   => $array['data'],
-            'links'  => $array['links'] ?? null,
-            'meta'   => $array['meta'] ?? null,
-        ]);
+        return $this->paginatedResponse($resource);
     }
 
     /**
@@ -50,10 +45,9 @@ class LeaveTypeController extends Controller
         $validated = $request->validated();
         $leaveType = LeaveType::create($validated);
 
-        return $this->successResponse(
+        return $this->createdResponse(
             new LeaveTypeResource($leaveType),
-            'Leave type created successfully',
-            Response::HTTP_CREATED
+            'Leave type created successfully'
         );
     }
 
@@ -76,7 +70,7 @@ class LeaveTypeController extends Controller
         $validated = $request->validated();
         $leaveType->update($validated);
 
-        return $this->successResponse(
+        return $this->updatedResponse(
             new LeaveTypeResource($leaveType),
             'Leave type updated successfully'
         );
@@ -89,10 +83,6 @@ class LeaveTypeController extends Controller
     {
         $leaveType->delete();
 
-        return $this->successResponse(
-            null,
-            'Leave type deleted successfully',
-            Response::HTTP_OK
-        );
+        return $this->deletedResponse('Leave type deleted successfully');
     }
 }

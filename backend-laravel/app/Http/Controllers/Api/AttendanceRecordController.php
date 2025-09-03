@@ -34,13 +34,8 @@ class AttendanceRecordController extends Controller
             ->paginate($request->input('per_page', 15));
 
         $resource = AttendanceRecordResource::collection($attendanceRecords);
-        $array = $resource->response()->getData(true);
 
-        return $this->successResponse([
-            'data'   => $array['data'],
-            'links'  => $array['links'] ?? null,
-            'meta'   => $array['meta'] ?? null,
-        ]);
+        return $this->paginatedResponse($resource);
     }
 
     /**
@@ -52,10 +47,9 @@ class AttendanceRecordController extends Controller
         $attendanceRecord = AttendanceRecord::create($validated);
         $attendanceRecord->load('employee');
 
-        return $this->successResponse(
+        return $this->createdResponse(
             new AttendanceRecordResource($attendanceRecord),
-            'Attendance record created successfully',
-            Response::HTTP_CREATED
+            'Attendance record created successfully'
         );
     }
 
@@ -80,7 +74,7 @@ class AttendanceRecordController extends Controller
         $attendanceRecord->update($validated);
         $attendanceRecord->load('employee');
 
-        return $this->successResponse(
+        return $this->updatedResponse(
             new AttendanceRecordResource($attendanceRecord),
             'Attendance record updated successfully'
         );
@@ -93,10 +87,6 @@ class AttendanceRecordController extends Controller
     {
         $attendanceRecord->delete();
 
-        return $this->successResponse(
-            null,
-            'Attendance record deleted successfully',
-            Response::HTTP_OK
-        );
+        return $this->deletedResponse('Attendance record deleted successfully');
     }
 }

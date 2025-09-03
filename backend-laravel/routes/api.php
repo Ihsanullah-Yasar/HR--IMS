@@ -30,12 +30,12 @@ Route::middleware('api')->group(function () {
     
     // Department Management
     Route::apiResource('departments', DepartmentController::class);
-    Route::get('/departments/create/form-data', [DepartmentController::class, 'createFormData']);
-    Route::get('/departments/{id}/form-data', [DepartmentController::class, 'formData'])->whereNumber('id');
+    Route::get('/departments/create/form-data', [DepartmentController::class, 'create']);
+    Route::get('/departments/{id}/form-data', [DepartmentController::class, 'edit'])->whereNumber('id');
     
     // Employee Management
     Route::apiResource('employees', EmployeeController::class);
-    Route::get('/employees/{id}/form-data', [EmployeeController::class, 'formData'])->whereNumber('id');
+    Route::get('/employees/{id}/form-data', [EmployeeController::class, 'edit'])->whereNumber('id');
     
     // Employee Documents
     Route::apiResource('employee-documents', EmployeeDocumentController::class);

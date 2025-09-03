@@ -34,13 +34,8 @@ class CurrencyController extends Controller
             ->paginate($request->input('per_page', 15));
 
         $resource = CurrencyResource::collection($currencies);
-        $array = $resource->response()->getData(true);
 
-        return $this->successResponse([
-            'data'   => $array['data'],
-            'links'  => $array['links'] ?? null,
-            'meta'   => $array['meta'] ?? null,
-        ]);
+        return $this->paginatedResponse($resource);
     }
 
     /**
@@ -51,10 +46,9 @@ class CurrencyController extends Controller
         $validated = $request->validated();
         $currency = Currency::create($validated);
 
-        return $this->successResponse(
+        return $this->createdResponse(
             new CurrencyResource($currency),
-            'Currency created successfully',
-            Response::HTTP_CREATED
+            'Currency created successfully'
         );
     }
 
@@ -77,7 +71,7 @@ class CurrencyController extends Controller
         $validated = $request->validated();
         $currency->update($validated);
 
-        return $this->successResponse(
+        return $this->updatedResponse(
             new CurrencyResource($currency),
             'Currency updated successfully'
         );
@@ -90,10 +84,6 @@ class CurrencyController extends Controller
     {
         $currency->delete();
 
-        return $this->successResponse(
-            null,
-            'Currency deleted successfully',
-            Response::HTTP_OK
-        );
+        return $this->deletedResponse('Currency deleted successfully');
     }
 }

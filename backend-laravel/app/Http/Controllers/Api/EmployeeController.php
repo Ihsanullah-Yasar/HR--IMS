@@ -43,13 +43,8 @@ class EmployeeController extends Controller
             ->paginate($request->input('per_page', 15));
 
         $resource = EmployeeResource::collection($employees);
-        $array = $resource->response()->getData(true);
 
-        return $this->successResponse([
-            'data'   => $array['data'],
-            'links'  => $array['links'] ?? null,
-            'meta'   => $array['meta'] ?? null,
-        ]);
+        return $this->paginatedResponse($resource);
     }
 
     /**
@@ -88,10 +83,9 @@ class EmployeeController extends Controller
         $employee = Employee::create($validated);
         $employee->load(['user', 'department', 'designation', 'createdBy', 'updatedBy', 'deletedBy']);
 
-        return $this->successResponse(
+        return $this->createdResponse(
             new EmployeeResource($employee),
-            'Employee created successfully',
-            Response::HTTP_CREATED
+            'Employee created successfully'
         );
     }
 
@@ -124,7 +118,7 @@ class EmployeeController extends Controller
         $employee->update($validated);
         $employee->load(['user', 'department', 'designation', 'createdBy', 'updatedBy', 'deletedBy']);
 
-        return $this->successResponse(
+        return $this->updatedResponse(
             new EmployeeResource($employee),
             'Employee updated successfully'
         );
@@ -140,10 +134,6 @@ class EmployeeController extends Controller
     {
         $employee->delete();
 
-        return $this->successResponse(
-            null,
-            'Employee deleted successfully',
-            Response::HTTP_OK
-        );
+        return $this->deletedResponse('Employee deleted successfully');
     }
 }

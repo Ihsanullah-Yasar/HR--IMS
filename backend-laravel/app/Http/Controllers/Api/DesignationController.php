@@ -41,14 +41,8 @@ class DesignationController extends Controller
             ->paginate($request->input('per_page', 15));
 
         $resource = DesignationResource::collection($designations);
-        $array = $resource->response()->getData(true);
 
-        return response()->json([
-            'status' => 'success',
-            'data'   => $array['data'],
-            'links'  => $array['links'] ?? null,
-            'meta'   => $array['meta'] ?? null,
-        ]);
+        return $this->paginatedResponse($resource);
     }
 
     /**
@@ -59,8 +53,10 @@ class DesignationController extends Controller
      */
     public function edit($id): JsonResponse
     {
+        $designation = Designation::with(['department', 'createdBy', 'updatedBy', 'deletedBy'])->findOrFail($id);
+        
         $data = [
-            'editingDesignation' => new DesignationResource(Designation::findOrFail($id)),
+            'editingDesignation' => new DesignationResource($designation),
             'departments' => Department::select('id as dId', 'name', 'code')
                 ->orderBy('name')
                 ->get()
@@ -97,10 +93,9 @@ class DesignationController extends Controller
         $designation = Designation::create($validated);
         $designation->load(['department', 'createdBy', 'updatedBy', 'deletedBy']);
 
-        return $this->successResponse(
+        return $this->createdResponse(
             new DesignationResource($designation),
-            'Designation created successfully',
-            Response::HTTP_CREATED
+            'Designation created successfully'
         );
     }
 
@@ -133,7 +128,7 @@ class DesignationController extends Controller
         $designation->update($validated);
         $designation->load(['department', 'createdBy', 'updatedBy', 'deletedBy']);
 
-        return $this->successResponse(
+        return $this->updatedResponse(
             new DesignationResource($designation),
             'Designation updated successfully'
         );
@@ -149,10 +144,6 @@ class DesignationController extends Controller
     {
         $designation->delete();
 
-        return $this->successResponse(
-            null,
-            'Designation deleted successfully',
-            Response::HTTP_OK
-        );
+        return $this->deletedResponse('Designation deleted successfully');
     }
 }

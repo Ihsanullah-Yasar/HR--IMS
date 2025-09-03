@@ -12,8 +12,7 @@ export const designationSchema = z.object({
   title: z
     .string()
     .min(2, "Title must be at least 2 characters")
-    .max(255, "Title must not exceed 255 characters")
-    .transform((val) => ({ en: val })), // Transform to multi-language object
+    .max(255, "Title must not exceed 255 characters"), // Keep as string
   baseSalary: z
     .number()
     .min(0, "Base salary must be a positive number")

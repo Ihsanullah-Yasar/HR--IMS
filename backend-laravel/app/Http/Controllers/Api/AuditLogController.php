@@ -34,13 +34,8 @@ class AuditLogController extends Controller
             ->paginate($request->input('per_page', 15));
 
         $resource = AuditLogResource::collection($auditLogs);
-        $array = $resource->response()->getData(true);
 
-        return $this->successResponse([
-            'data'   => $array['data'],
-            'links'  => $array['links'] ?? null,
-            'meta'   => $array['meta'] ?? null,
-        ]);
+        return $this->paginatedResponse($resource);
     }
 
     /**

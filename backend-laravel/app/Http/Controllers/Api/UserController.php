@@ -49,13 +49,8 @@ class UserController extends Controller
 
 
         $resource = UserResource::collection($users);
-        $array = $resource->response()->getData(true);
 
-        return $this->successResponse([
-            'data'   => $array['data'],
-            'links'  => $array['links'] ?? null,
-            'meta'   => $array['meta'] ?? null,
-        ]);
+        return $this->paginatedResponse($resource);
     }
 
     /**
@@ -71,10 +66,9 @@ class UserController extends Controller
 
         $user = User::create($validated);
 
-        return $this->successResponse(
+        return $this->createdResponse(
             new UserResource($user),
-            'User created successfully',
-            Response::HTTP_CREATED
+            'User created successfully'
         );
     }
 
@@ -110,7 +104,7 @@ class UserController extends Controller
         $user->update($validated);
         // $user->load(['roles', 'permissions', 'profile']);
 
-        return $this->successResponse(
+        return $this->updatedResponse(
             new UserResource($user),
             'User updated successfully'
         );
@@ -126,10 +120,6 @@ class UserController extends Controller
     {
         $user->delete();
 
-        return $this->successResponse(
-            null,
-            'User deleted successfully',
-            Response::HTTP_OK
-        );
+        return $this->deletedResponse('User deleted successfully');
     }
 }

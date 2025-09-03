@@ -34,13 +34,8 @@ class EmployeeDocumentController extends Controller
             ->paginate($request->input('per_page', 15));
 
         $resource = EmployeeDocumentResource::collection($documents);
-        $array = $resource->response()->getData(true);
 
-        return $this->successResponse([
-            'data'   => $array['data'],
-            'links'  => $array['links'] ?? null,
-            'meta'   => $array['meta'] ?? null,
-        ]);
+        return $this->paginatedResponse($resource);
     }
 
     /**
@@ -63,10 +58,9 @@ class EmployeeDocumentController extends Controller
 
         $document->load('employee');
 
-        return $this->successResponse(
+        return $this->createdResponse(
             new EmployeeDocumentResource($document),
-            'Employee document uploaded successfully',
-            Response::HTTP_CREATED
+            'Employee document uploaded successfully'
         );
     }
 
@@ -100,7 +94,7 @@ class EmployeeDocumentController extends Controller
         $employeeDocument->update($validated);
         $employeeDocument->load('employee');
 
-        return $this->successResponse(
+        return $this->updatedResponse(
             new EmployeeDocumentResource($employeeDocument),
             'Employee document updated successfully'
         );
@@ -117,10 +111,6 @@ class EmployeeDocumentController extends Controller
 
         $employeeDocument->delete();
 
-        return $this->successResponse(
-            null,
-            'Employee document deleted successfully',
-            Response::HTTP_OK
-        );
+        return $this->deletedResponse('Employee document deleted successfully');
     }
 }

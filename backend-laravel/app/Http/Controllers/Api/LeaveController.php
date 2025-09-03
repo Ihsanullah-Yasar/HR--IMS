@@ -37,13 +37,8 @@ class LeaveController extends Controller
             ->paginate($request->input('per_page', 15));
 
         $resource = LeaveResource::collection($leaves);
-        $array = $resource->response()->getData(true);
 
-        return $this->successResponse([
-            'data'   => $array['data'],
-            'links'  => $array['links'] ?? null,
-            'meta'   => $array['meta'] ?? null,
-        ]);
+        return $this->paginatedResponse($resource);
     }
 
     /**
@@ -55,10 +50,9 @@ class LeaveController extends Controller
         $leave = Leave::create($validated);
         $leave->load(['employee', 'leaveType']);
 
-        return $this->successResponse(
+        return $this->createdResponse(
             new LeaveResource($leave),
-            'Leave request created successfully',
-            Response::HTTP_CREATED
+            'Leave request created successfully'
         );
     }
 
@@ -83,7 +77,7 @@ class LeaveController extends Controller
         $leave->update($validated);
         $leave->load(['employee', 'leaveType']);
 
-        return $this->successResponse(
+        return $this->updatedResponse(
             new LeaveResource($leave),
             'Leave request updated successfully'
         );
@@ -96,10 +90,6 @@ class LeaveController extends Controller
     {
         $leave->delete();
 
-        return $this->successResponse(
-            null,
-            'Leave request deleted successfully',
-            Response::HTTP_OK
-        );
+        return $this->deletedResponse('Leave request deleted successfully');
     }
 }

@@ -1,6 +1,7 @@
 "use client";
 import {
   designationSchema,
+  designationUpdateSchema,
   DesignationFormData,
   DesignationUpdateFormData,
 } from "@/lib/Schemas/designation";
@@ -69,6 +70,29 @@ export const DesignationForm = ({
       department: "",
     },
   });
+
+  // Reset form when formData changes (for update mode)
+  React.useEffect(() => {
+    if (mode === "update" && formData?.editingDesignation) {
+      const designation = formData.editingDesignation;
+
+      const formValues = {
+        code: designation.code || "",
+        title:
+          typeof designation.title === "string"
+            ? designation.title
+            : (designation.title as any)?.en || "",
+        baseSalary:
+          typeof designation.baseSalary === "string"
+            ? parseFloat(designation.baseSalary)
+            : designation.baseSalary || 0,
+        isActive: designation.isActive ?? true,
+        department: designation.departmentId?.toString() || "",
+      };
+
+      form.reset(formValues);
+    }
+  }, [formData, mode, form]);
 
   // Create mutation
   const createMutation = useMutation({

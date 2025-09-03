@@ -1,16 +1,18 @@
 "use client";
 import { EditDesignation } from "@/components/Forms/designation/editDesignation";
+import { use } from "react";
 
 type EditDesignationPageProps = {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 };
 
 export default function EditDesignationPage({
   params,
 }: EditDesignationPageProps) {
-  const designationId = parseInt(params.id);
+  const resolvedParams = use(params);
+  const designationId = parseInt(resolvedParams.id);
 
   if (isNaN(designationId)) {
     return (

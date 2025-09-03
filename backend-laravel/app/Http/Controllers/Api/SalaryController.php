@@ -35,13 +35,8 @@ class SalaryController extends Controller
             ->paginate($request->input('per_page', 15));
 
         $resource = SalaryResource::collection($salaries);
-        $array = $resource->response()->getData(true);
 
-        return $this->successResponse([
-            'data'   => $array['data'],
-            'links'  => $array['links'] ?? null,
-            'meta'   => $array['meta'] ?? null,
-        ]);
+        return $this->paginatedResponse($resource);
     }
 
     /**
@@ -53,10 +48,9 @@ class SalaryController extends Controller
         $salary = Salary::create($validated);
         $salary->load(['employee', 'currency']);
 
-        return $this->successResponse(
+        return $this->createdResponse(
             new SalaryResource($salary),
-            'Salary record created successfully',
-            Response::HTTP_CREATED
+            'Salary record created successfully'
         );
     }
 
@@ -81,7 +75,7 @@ class SalaryController extends Controller
         $salary->update($validated);
         $salary->load(['employee', 'currency']);
 
-        return $this->successResponse(
+        return $this->updatedResponse(
             new SalaryResource($salary),
             'Salary record updated successfully'
         );
@@ -94,10 +88,6 @@ class SalaryController extends Controller
     {
         $salary->delete();
 
-        return $this->successResponse(
-            null,
-            'Salary record deleted successfully',
-            Response::HTTP_OK
-        );
+        return $this->deletedResponse('Salary record deleted successfully');
     }
 }

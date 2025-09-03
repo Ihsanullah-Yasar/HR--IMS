@@ -39,13 +39,8 @@ class DepartmentController extends Controller
             ->paginate($request->input('per_page', 15));
 
         $resource = DepartmentResource::collection($departments);
-        $array = $resource->response()->getData(true);
 
-        return $this->successResponse([
-            'data'   => $array['data'],
-            'links'  => $array['links'] ?? null,
-            'meta'   => $array['meta'] ?? null,
-        ]);
+        return $this->paginatedResponse($resource);
     }
 
     /**
@@ -117,10 +112,9 @@ class DepartmentController extends Controller
 
         $department->load(['parentDepartment', 'currentManager.employee', 'createdBy', 'updatedBy', 'deletedBy']);
 
-        return $this->successResponse(
+        return $this->createdResponse(
             new DepartmentResource($department),
-            'Department created successfully',
-            Response::HTTP_CREATED
+            'Department created successfully'
         );
     }
 
@@ -175,7 +169,7 @@ class DepartmentController extends Controller
 
         $department->load(['parentDepartment', 'currentManager.employee', 'createdBy', 'updatedBy', 'deletedBy']);
 
-        return $this->successResponse(
+        return $this->updatedResponse(
             new DepartmentResource($department),
             'Department updated successfully'
         );
@@ -191,10 +185,6 @@ class DepartmentController extends Controller
     {
         $department->delete();
 
-        return $this->successResponse(
-            null,
-            'Department deleted successfully',
-            Response::HTTP_OK
-        );
+        return $this->deletedResponse('Department deleted successfully');
     }
 }

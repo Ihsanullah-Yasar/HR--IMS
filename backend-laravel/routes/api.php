@@ -34,8 +34,9 @@ Route::middleware('api')->group(function () {
     Route::get('/departments/{id}/form-data', [DepartmentController::class, 'edit'])->whereNumber('id');
     
     // Employee Management
+    Route::get('/employees/create', [EmployeeController::class, 'create']);
+    Route::get('/employees/{id}/edit', [EmployeeController::class, 'edit'])->whereNumber('id');
     Route::apiResource('employees', EmployeeController::class);
-    Route::get('/employees/{id}/form-data', [EmployeeController::class, 'edit'])->whereNumber('id');
     
     // Employee Documents
     Route::apiResource('employee-documents', EmployeeDocumentController::class);

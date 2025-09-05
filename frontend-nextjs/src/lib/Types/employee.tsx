@@ -1,41 +1,71 @@
-enum Gender {
-  Male,
-  Female,
-  Other,
+export enum GenderType {
+  MALE = "MALE",
+  FEMALE = "FEMALE",
+  OTHER = "OTHER",
 }
 
-enum MartialStatus {
-  Single = "SINGLE",
-  Married = "MARRIED",
-  Divorced = "DIVORCED",
-  Widowed = "WIDOWED",
-  Separated = "SEPARATED",
+export enum MaritalStatusType {
+  SINGLE = "SINGLE",
+  MARRIED = "MARRIED",
+  DIVORCED = "DIVORCED",
+  WIDOWED = "WIDOWED",
+  SEPARATED = "SEPARATED",
 }
 
 export interface Employee {
   id: number;
 
-  // Core fields
-  name: string; // multi-language first name
-  gender_type?: Gender | null;
-  marital_status?: MartialStatus | null;
-  date_of_birth: string; // ISO date string (YYYY-MM-DD)
-  date_of_joining: string; // ISO date string
-  date_of_leaving?: string | null; // nullable ISO date string
-  timezone: string; // default 'UTC'
-  consent_given: boolean; // default false
-  data_retention_until?: string | null; // nullable timestamp (ISO)
+  // Core fields (aligned to EmployeeResource keys for FE usage)
+  name: string;
+  genderType?: GenderType | null;
+  maritalStatus?: MaritalStatusType | null;
+  dateOfBirth: string;
+  dateOfJoining: string;
+  dateOfLeaving?: string | null;
+  timezone: string;
+  consentGiven: boolean;
+  dataRetentionUntil?: string | null;
 
-  // Audit
-  created_by?: number | null; // FK -> users.id
-  updated_by?: number | null; // FK -> users.id
-  deleted_by?: number | null; // FK -> users.id
-  created_at: string; // ISO timestamp
-  updated_at: string; // ISO timestamp
-  deleted_at?: string | null; // for soft deletes
+  // Relations by id
+  userId?: number | null;
+  departmentId: number;
+  designationId: number;
 
-  // Foreign relations
-  user_id?: number | null; // unique FK -> users.id
-  department_id: number; // FK -> departments.id (required)
-  designation_id: number; // FK -> designations.id (required)
+  // Expanded relations (optional)
+  user?: any;
+  department?: any;
+  designation?: any;
+
+  // Audit ids
+  createdBy?: number | null;
+  updatedBy?: number | null;
+  deletedBy?: number | null;
+
+  // Timestamps
+  createdAt: string;
+  updatedAt: string;
+  deletedAt?: string | null;
 }
+
+export type EmployeeCreateData = {
+  name: string;
+  genderType?: GenderType | null;
+  maritalStatus?: MaritalStatusType | null;
+  dateOfBirth: string;
+  dateOfJoining: string;
+  dateOfLeaving?: string | null;
+  timezone: string;
+  consentGiven: boolean;
+  user?: string | null; // select value (id as string)
+  department: string; // select value (id as string)
+  designation: string; // select value (id as string)
+};
+
+export type EmployeeUpdateData = Partial<EmployeeCreateData>;
+
+export type EmployeeEditFormData = {
+  editingEmployee: Employee;
+  departments: Array<{ id: number; name: string; code: string }>;
+  designations: Array<{ id: number; code: string; title: string }>;
+  users: Array<{ id: number; name: string; email: string }>;
+};

@@ -30,8 +30,8 @@ export const designationFilterConfig: FilterConfig[] = [
     value: "is_active",
     type: "select",
     options: [
-      { label: "Active", value: "true" },
-      { label: "Inactive", value: "false" },
+      { label: "Active", value: "1" },
+      { label: "Inactive", value: "0" },
     ],
   },
 ];

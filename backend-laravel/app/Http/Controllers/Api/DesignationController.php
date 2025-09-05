@@ -32,7 +32,15 @@ class DesignationController extends Controller
             ->with(['department', 'createdBy', 'updatedBy', 'deletedBy'])
             ->allowedFilters([
                 AllowedFilter::partial('code'),
-                AllowedFilter::partial('title'),
+                // Title is stored as JSON; do a case-insensitive search within JSON text
+                AllowedFilter::callback('title', function ($query, $value) {
+                    $search = is_array($value) ? ($value[0] ?? '') : $value;
+                    if ($search === '' || $search === null) {
+                        return;
+                    }
+                    // Works with PostgreSQL jsonb using ::text cast
+                    $query->whereRaw('LOWER(title::text) LIKE ?', ['%' . strtolower($search) . '%']);
+                }),
                 AllowedFilter::partial('department.name'),
                 AllowedFilter::exact('is_active'),
             ])

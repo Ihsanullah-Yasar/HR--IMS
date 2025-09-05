@@ -68,9 +68,9 @@ export function Combobox({
           <CommandList>
             <CommandEmpty>{emptyText}</CommandEmpty>
             <CommandGroup>
-              {options.map((option) => (
+              {options.map((option, index) => (
                 <CommandItem
-                  key={option.value}
+                  key={`${option.value || "undefined"}-${index}`}
                   value={option.searchValue || option.label} // Use searchValue or label for search
                   onSelect={() => {
                     onValueChange(option.value);

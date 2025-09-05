@@ -34,10 +34,8 @@ class EmployeeController extends Controller
             ->allowedFilters([
                 AllowedFilter::partial('name'),
                 AllowedFilter::partial('gender_type'),
-                AllowedFilter::partial('marital_status'),
                 AllowedFilter::partial('department.name'),
                 AllowedFilter::partial('designation.code'),
-                AllowedFilter::partial('user.name'),
             ])
             ->allowedSorts(['name', 'date_of_joining', 'date_of_birth', 'created_at'])
             ->paginate($request->input('per_page', 15));
@@ -48,23 +46,39 @@ class EmployeeController extends Controller
     }
 
     /**
-     * Display a list of resources for select in dropdown.
+     * Get departments for employee creation form.
      *
-     * @param Request $request
      * @return JsonResponse
      */
-    public function formData($id): JsonResponse
+    public function create(): JsonResponse
     {
         $data = [
-            'editingEmployee' => new EmployeeResource(Employee::findOrFail($id)),
             'departments' => Department::select('id', 'name', 'code')
                 ->orderBy('name')
                 ->get(),
             'designations' => Designation::select('id', 'code', 'title')
                 ->orderBy('code')
-                ->get(),
-            'users' => User::select('id', 'name', 'email')
+                ->get()
+        ];
+
+        return $this->successResponse($data);
+    }
+
+    /**
+     * Display a list of resources for select in dropdown.
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function edit($id): JsonResponse
+    {
+        $data = [
+            'editingEmployee' => new EmployeeResource(Employee::findOrFail($id)),
+            'departments' => Department::select('id as dId', 'name', 'code')
                 ->orderBy('name')
+                ->get(),
+            'designations' => Designation::select('id as dId', 'code', 'title')
+                ->orderBy('code')
                 ->get()
         ];
 

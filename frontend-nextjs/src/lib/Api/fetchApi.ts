@@ -31,11 +31,17 @@ const createFetchApi = (config: any) => {
     const { queryString, body, ...restOptions } = options;
     const url = `${baseUrl}${endpoint}${queryString ? `?${queryString}` : ''}`;
     console.log(url)
+    
+    // Don't set Content-Type for FormData, let the browser set it with boundary
+    const isFormData = body instanceof FormData;
     const headers = new Headers({
-      'Content-Type': 'application/json',
       ...defaultHeaders,
       ...options.headers,
     });
+    
+    if (!isFormData) {
+      headers.set('Content-Type', 'application/json');
+    }
 
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), timeout);
@@ -44,7 +50,7 @@ const createFetchApi = (config: any) => {
       const response = await fetch(url, {
         ...restOptions,
         headers,
-        body: body ? JSON.stringify(body) : undefined,
+        body: body ? (isFormData ? body : JSON.stringify(body)) : undefined,
         signal: controller.signal,
       });
 

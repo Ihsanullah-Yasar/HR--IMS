@@ -39,6 +39,8 @@ Route::middleware('api')->group(function () {
     Route::apiResource('employees', EmployeeController::class);
     
     // Employee Documents
+    Route::get('/employee-documents/create', [EmployeeDocumentController::class, 'create']);
+    Route::get('/employee-documents/{id}/edit', [EmployeeDocumentController::class, 'edit'])->whereNumber('id');
     Route::apiResource('employee-documents', EmployeeDocumentController::class);
     
     // Designation Management

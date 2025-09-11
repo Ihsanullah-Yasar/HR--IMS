@@ -14,6 +14,7 @@ use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 use Illuminate\Support\Facades\Storage;
 use App\Traits\ApiResponseTrait;
+use App\Models\Employee;
 
 class EmployeeDocumentController extends Controller
 {
@@ -36,6 +37,35 @@ class EmployeeDocumentController extends Controller
         $resource = EmployeeDocumentResource::collection($documents);
 
         return $this->paginatedResponse($resource);
+    }
+
+    /**
+     * Get form data for creating an employee document.
+     */
+    public function create(): JsonResponse
+    {
+        $data = [
+            'employees' => Employee::select('id', 'name')
+                ->orderBy('name')
+                ->get(),
+        ];
+
+        return $this->successResponse($data);
+    }
+
+    /**
+     * Get form data for editing an employee document.
+     */
+    public function edit($id): JsonResponse
+    {
+        $data = [
+            'editingDocument' => new EmployeeDocumentResource(EmployeeDocument::findOrFail($id)),
+            'employees' => Employee::select('id', 'name')
+                ->orderBy('name')
+                ->get(),
+        ];
+
+        return $this->successResponse($data);
     }
 
     /**

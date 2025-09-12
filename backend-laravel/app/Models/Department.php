@@ -24,9 +24,9 @@ class Department extends Model
     /**
      * 🔹 Relationship: A department can have many users (employees).
      */
-    public function users()
+    public function employees()
     {
-        return $this->hasMany(User::class, 'department_id', 'id');
+        return $this->hasMany(Employee::class, 'department_id', 'id');
     }
 
     /**
@@ -34,7 +34,7 @@ class Department extends Model
      */
     public function manager()
     {
-        return $this->belongsTo(User::class, 'manager_id');
+        return $this->belongsTo(Employee::class, 'manager_id');
     }
 
     /**

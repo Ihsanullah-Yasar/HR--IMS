@@ -75,7 +75,7 @@ export const createEmployeeDocument = async (
 ): Promise<ApiResponse<EmployeeDocument>> => {
   try {
     const formData = new FormData();
-    formData.append("employee_id", documentData.employeeId);
+    formData.append("employee_id", documentData.employeeId.toString());
     formData.append("type", documentData.type);
     formData.append("expiry_date", documentData.expiryDate || "");
 
@@ -113,7 +113,7 @@ export const updateEmployeeDocument = async (
   try {
     const payload: Record<string, any> = {};
     if (documentData.employeeId !== undefined)
-      payload.employee_id = parseInt(documentData.employeeId);
+      payload.employee_id = documentData.employeeId.toString();
     if (documentData.type !== undefined) payload.type = documentData.type;
     if (documentData.path !== undefined) payload.path = documentData.path;
     if (documentData.expiryDate !== undefined)

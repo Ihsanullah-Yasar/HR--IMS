@@ -50,6 +50,7 @@ Route::middleware('api')->group(function () {
     
     // Attendance Management
     Route::apiResource('attendance-records', AttendanceRecordController::class);
+    Route::get('/attendance-records/create/form-data', [AttendanceRecordController::class, 'create']);
     
     // Leave Management
     Route::apiResource('leaves', LeaveController::class);

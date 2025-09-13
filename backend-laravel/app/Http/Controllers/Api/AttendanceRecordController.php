@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 use App\Traits\ApiResponseTrait;
+use App\Models\Employee;
 
 class AttendanceRecordController extends Controller
 {
@@ -24,13 +25,15 @@ class AttendanceRecordController extends Controller
     public function index(Request $request): JsonResponse
     {
         $attendanceRecords = QueryBuilder::for(AttendanceRecord::query())
-            ->with(['employee'])
+            ->with(['employee.department'])
             ->allowedFilters([
                 AllowedFilter::exact('employee_id'),
                 AllowedFilter::partial('employee.name'),
+                AllowedFilter::partial('employee.department.name'),
                 AllowedFilter::scope('date_range'),
+                AllowedFilter::scope('for_employee'),
             ])
-            ->allowedSorts(['date', 'check_in_time', 'check_out_time', 'created_at'])
+            ->allowedSorts(['log_date', 'check_in', 'check_out', 'created_at'])
             ->paginate($request->input('per_page', 15));
 
         $resource = AttendanceRecordResource::collection($attendanceRecords);
@@ -39,13 +42,36 @@ class AttendanceRecordController extends Controller
     }
 
     /**
+     * Get employees for attendance creation form.
+     */
+    public function create(): JsonResponse
+    {
+        $data = [
+            'employees' => Employee::with('department')
+                ->select('id', 'name', 'department_id','department_id')
+                ->orderBy('name')
+                ->get()
+        ];
+
+        return $this->successResponse($data);
+    }
+
+    /**
      * Store a newly created resource in storage.
      */
     public function store(StoreAttendanceRecordRequest $request): JsonResponse
     {
         $validated = $request->validated();
+        
+        // Calculate hours worked if both check_in and check_out are provided
+        if ($validated['check_in'] && $validated['check_out']) {
+            $checkIn = \Carbon\Carbon::parse($validated['check_in']);
+            $checkOut = \Carbon\Carbon::parse($validated['check_out']);
+            $validated['hours_worked'] = $checkOut->diffInHours($checkIn, true);
+        }
+        
         $attendanceRecord = AttendanceRecord::create($validated);
-        $attendanceRecord->load('employee');
+        $attendanceRecord->load(['employee.department']);
 
         return $this->createdResponse(
             new AttendanceRecordResource($attendanceRecord),
@@ -58,7 +84,7 @@ class AttendanceRecordController extends Controller
      */
     public function show(AttendanceRecord $attendanceRecord): JsonResponse
     {
-        $attendanceRecord->load('employee');
+        $attendanceRecord->load(['employee.department']);
         return $this->successResponse(
             new AttendanceRecordResource($attendanceRecord),
             'Attendance record retrieved successfully'
@@ -71,8 +97,16 @@ class AttendanceRecordController extends Controller
     public function update(UpdateAttendanceRecordRequest $request, AttendanceRecord $attendanceRecord): JsonResponse
     {
         $validated = $request->validated();
+        
+        // Calculate hours worked if both check_in and check_out are provided
+        if (isset($validated['check_in']) && isset($validated['check_out'])) {
+            $checkIn = \Carbon\Carbon::parse($validated['check_in']);
+            $checkOut = \Carbon\Carbon::parse($validated['check_out']);
+            $validated['hours_worked'] = $checkOut->diffInHours($checkIn, true);
+        }
+        
         $attendanceRecord->update($validated);
-        $attendanceRecord->load('employee');
+        $attendanceRecord->load(['employee.department']);
 
         return $this->updatedResponse(
             new AttendanceRecordResource($attendanceRecord),

@@ -288,9 +288,9 @@ export default function DynamicTableFilters({
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="start">
-                        {textConfigs.map((config) => (
+                        {textConfigs.map((config, index) => (
                           <DropdownMenuItem
-                            key={config.value}
+                            key={`text-${index}-${config.value || "undefined"}`}
                             onClick={() => setSelectedTextField(config.value)}
                           >
                             {config.label}
@@ -331,7 +331,7 @@ export default function DynamicTableFilters({
               )}
 
               {/* Independent Select Filters */}
-              {selectConfigs.map((config) => {
+              {selectConfigs.map((config, index) => {
                 const activeValue =
                   activeFilters.find((f) => f.key === config.value)?.value ||
                   "";
@@ -341,7 +341,7 @@ export default function DynamicTableFilters({
 
                 return (
                   <div
-                    key={config.value}
+                    key={`select-${index}-${config.value || "undefined"}`}
                     className="flex flex-col gap-1 min-w-[200px]"
                   >
                     <label className="text-xs font-medium">

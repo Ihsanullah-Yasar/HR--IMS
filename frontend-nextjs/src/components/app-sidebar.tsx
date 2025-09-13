@@ -20,6 +20,7 @@ import {
   IconUsers,
   IconBuilding,
   IconUser,
+  IconClock,
 } from "@tabler/icons-react";
 
 import { NavDocuments } from "@/components/nav-documents";
@@ -67,6 +68,11 @@ const data = {
       title: "Employees",
       url: "/dashboard/employees",
       icon: IconUser,
+    },
+    {
+      title: "Attendance",
+      url: "/dashboard/attendance",
+      icon: IconClock,
     },
     {
       title: "Analytics",

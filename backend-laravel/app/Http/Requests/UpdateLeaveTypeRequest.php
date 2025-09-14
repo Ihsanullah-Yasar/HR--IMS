@@ -23,14 +23,18 @@ class UpdateLeaveTypeRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => [
+            'code' => [
                 'sometimes',
                 'string',
-                'max:100',
-                Rule::unique('leave_types', 'name')->ignore($this->leave_type->id),
+                'max:10',
+                Rule::unique('leave_types', 'code')->ignore($this->leave_type->id),
             ],
+            'name' => 'sometimes|array',
+            'name.en' => 'sometimes|string|max:100',
+            'name.ar' => 'sometimes|nullable|string|max:100',
             'description' => 'sometimes|nullable|string|max:500',
-            'default_days' => 'sometimes|numeric|min:0',
+            'days_per_year' => 'sometimes|integer|min:0|max:365',
+            'is_paid' => 'sometimes|boolean',
             'is_active' => 'sometimes|boolean',
             'color' => 'sometimes|nullable|string|max:7|regex:/^#[0-9A-F]{6}$/i',
         ];

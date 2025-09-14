@@ -54,7 +54,11 @@ Route::middleware('api')->group(function () {
     
     // Leave Management
     Route::apiResource('leaves', LeaveController::class);
+    Route::get('/leaves/create/form-data', [LeaveController::class, 'create']);
+    Route::get('/leaves/{id}/form-data', [LeaveController::class, 'edit'])->whereNumber('id');
     Route::apiResource('leave-types', LeaveTypeController::class);
+    Route::get('/leave-types/create/form-data', [LeaveTypeController::class, 'create']);
+    Route::get('/leave-types/{id}/form-data', [LeaveTypeController::class, 'edit'])->whereNumber('id');
     
     // Salary Management
     Route::apiResource('salaries', SalaryController::class);

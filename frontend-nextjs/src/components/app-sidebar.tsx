@@ -21,6 +21,7 @@ import {
   IconBuilding,
   IconUser,
   IconClock,
+  IconCalendar,
 } from "@tabler/icons-react";
 
 import { NavDocuments } from "@/components/nav-documents";
@@ -73,6 +74,16 @@ const data = {
       title: "Attendance",
       url: "/dashboard/attendance",
       icon: IconClock,
+    },
+    {
+      title: "Leave Types",
+      url: "/dashboard/leave-types",
+      icon: IconCalendar,
+    },
+    {
+      title: "Leave Requests",
+      url: "/dashboard/leaves",
+      icon: IconListDetails,
     },
     {
       title: "Analytics",

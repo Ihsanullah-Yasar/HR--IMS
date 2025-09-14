@@ -20,16 +20,21 @@ class LeaveTypeController extends Controller
 
     /**
      * Display a listing of the resource.
+     *
+     * @param Request $request
+     * @return JsonResponse
      */
     public function index(Request $request): JsonResponse
     {
         $leaveTypes = QueryBuilder::for(LeaveType::query())
+            ->with(['createdBy', 'updatedBy', 'deletedBy'])
             ->allowedFilters([
                 AllowedFilter::partial('name'),
-                AllowedFilter::partial('description'),
+                AllowedFilter::partial('code'),
+                AllowedFilter::exact('is_paid'),
                 AllowedFilter::exact('is_active'),
             ])
-            ->allowedSorts(['name', 'default_days', 'created_at'])
+            ->allowedSorts(['name', 'code', 'days_per_year', 'created_at'])
             ->paginate($request->input('per_page', 15));
 
         $resource = LeaveTypeResource::collection($leaveTypes);
@@ -38,12 +43,49 @@ class LeaveTypeController extends Controller
     }
 
     /**
+     * Display a list of resources for select in dropdown.
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function edit($id): JsonResponse
+    {
+        $data = [
+            'editingLeaveType' => new LeaveTypeResource(LeaveType::findOrFail($id)),
+        ];
+
+        return $this->successResponse($data);
+    }
+
+    /**
+     * Get leave types for leave type creation form.
+     *
+     * @return JsonResponse
+     */
+    public function create(): JsonResponse
+    {
+        $data = [
+            'leaveTypes' => LeaveType::select('id as ltId', 'name', 'code')
+                ->where('is_active', true)
+                ->orderBy('name')
+                ->get()
+        ];
+
+        return $this->successResponse($data);
+    }
+
+    /**
      * Store a newly created resource in storage.
+     *
+     * @param StoreLeaveTypeRequest $request
+     * @return JsonResponse
      */
     public function store(StoreLeaveTypeRequest $request): JsonResponse
     {
         $validated = $request->validated();
+        
         $leaveType = LeaveType::create($validated);
+        $leaveType->load(['createdBy', 'updatedBy', 'deletedBy']);
 
         return $this->createdResponse(
             new LeaveTypeResource($leaveType),
@@ -53,9 +95,13 @@ class LeaveTypeController extends Controller
 
     /**
      * Display the specified resource.
+     *
+     * @param LeaveType $leaveType
+     * @return JsonResponse
      */
     public function show(LeaveType $leaveType): JsonResponse
     {
+        $leaveType->load(['createdBy', 'updatedBy', 'deletedBy']);
         return $this->successResponse(
             new LeaveTypeResource($leaveType),
             'Leave type retrieved successfully'
@@ -64,11 +110,16 @@ class LeaveTypeController extends Controller
 
     /**
      * Update the specified resource in storage.
+     *
+     * @param UpdateLeaveTypeRequest $request
+     * @param LeaveType $leaveType
+     * @return JsonResponse
      */
     public function update(UpdateLeaveTypeRequest $request, LeaveType $leaveType): JsonResponse
     {
         $validated = $request->validated();
         $leaveType->update($validated);
+        $leaveType->load(['createdBy', 'updatedBy', 'deletedBy']);
 
         return $this->updatedResponse(
             new LeaveTypeResource($leaveType),
@@ -78,6 +129,9 @@ class LeaveTypeController extends Controller
 
     /**
      * Remove the specified resource from storage.
+     *
+     * @param LeaveType $leaveType
+     * @return JsonResponse
      */
     public function destroy(LeaveType $leaveType): JsonResponse
     {

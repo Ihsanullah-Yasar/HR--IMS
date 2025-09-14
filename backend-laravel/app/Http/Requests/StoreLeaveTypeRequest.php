@@ -22,9 +22,13 @@ class StoreLeaveTypeRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|string|max:100|unique:leave_types,name',
+            'code' => 'required|string|max:10|unique:leave_types,code',
+            'name' => 'required|array',
+            'name.en' => 'required|string|max:100',
+            'name.ar' => 'nullable|string|max:100',
             'description' => 'nullable|string|max:500',
-            'default_days' => 'required|numeric|min:0',
+            'days_per_year' => 'required|integer|min:0|max:365',
+            'is_paid' => 'boolean',
             'is_active' => 'boolean',
             'color' => 'nullable|string|max:7|regex:/^#[0-9A-F]{6}$/i',
         ];

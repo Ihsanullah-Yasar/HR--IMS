@@ -13,6 +13,7 @@ import {
   IconHelp,
   IconInnerShadowTop,
   IconListDetails,
+  IconCurrencyDollar,
   IconBriefcase,
   IconReport,
   IconSearch,
@@ -84,6 +85,11 @@ const data = {
       title: "Leave Requests",
       url: "/dashboard/leaves",
       icon: IconListDetails,
+    },
+    {
+      title: "Currencies",
+      url: "/dashboard/currencies",
+      icon: IconCurrencyDollar,
     },
     {
       title: "Analytics",

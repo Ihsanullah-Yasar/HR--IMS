@@ -65,6 +65,8 @@ Route::middleware('api')->group(function () {
     
     // Currency Management
     Route::apiResource('currencies', CurrencyController::class);
+    Route::get('/currencies/create/form-data', [CurrencyController::class, 'create']);
+    Route::get('/currencies/{id}/form-data', [CurrencyController::class, 'edit'])->whereNumber('id');
     
     // Audit Logs (Read-only)
     Route::apiResource('audit-logs', AuditLogController::class)->only(['index', 'show']);

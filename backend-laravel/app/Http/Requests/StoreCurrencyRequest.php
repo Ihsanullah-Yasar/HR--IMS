@@ -22,10 +22,12 @@ class StoreCurrencyRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|string|max:100',
             'code' => 'required|string|size:3|unique:currencies,code|regex:/^[A-Z]{3}$/',
+            'name' => 'required|array',
+            'name.en' => 'required|string|max:100',
+            'name.ar' => 'nullable|string|max:100',
             'symbol' => 'required|string|max:10',
-            'exchange_rate' => 'required|numeric|min:0',
+            'decimal_places' => 'required|integer|min:0|max:4',
             'is_active' => 'boolean',
         ];
     }

@@ -23,7 +23,6 @@ class UpdateCurrencyRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'sometimes|string|max:100',
             'code' => [
                 'sometimes',
                 'string',
@@ -31,8 +30,11 @@ class UpdateCurrencyRequest extends FormRequest
                 'regex:/^[A-Z]{3}$/',
                 Rule::unique('currencies', 'code')->ignore($this->currency->id),
             ],
+            'name' => 'sometimes|array',
+            'name.en' => 'sometimes|string|max:100',
+            'name.ar' => 'sometimes|nullable|string|max:100',
             'symbol' => 'sometimes|string|max:10',
-            'exchange_rate' => 'sometimes|numeric|min:0',
+            'decimal_places' => 'sometimes|integer|min:0|max:4',
             'is_active' => 'sometimes|boolean',
         ];
     }

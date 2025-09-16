@@ -40,6 +40,43 @@ class SalaryController extends Controller
     }
 
     /**
+     * Display a list of resources for select in dropdown.
+     */
+    public function edit($id): JsonResponse
+    {
+        $data = [
+            'editingSalary' => new SalaryResource(Salary::findOrFail($id)),
+            'employees' => \App\Models\Employee::select('id', 'name')
+                ->orderBy('name')
+                ->get(),
+            'currencies' => \App\Models\Currency::select('code', 'name', 'symbol')
+                ->where('is_active', true)
+                ->orderBy('name')
+                ->get()
+        ];
+
+        return $this->successResponse($data);
+    }
+
+    /**
+     * Get employees and currencies for salary creation form.
+     */
+    public function create(): JsonResponse
+    {
+        $data = [
+            'employees' => \App\Models\Employee::select('id', 'name')
+                ->orderBy('name')
+                ->get(),
+            'currencies' => \App\Models\Currency::select('code', 'name', 'symbol')
+                ->where('is_active', true)
+                ->orderBy('name')
+                ->get()
+        ];
+
+        return $this->successResponse($data);
+    }
+
+    /**
      * Store a newly created resource in storage.
      */
     public function store(StoreSalaryRequest $request): JsonResponse

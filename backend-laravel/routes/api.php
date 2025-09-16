@@ -62,6 +62,8 @@ Route::middleware('api')->group(function () {
     
     // Salary Management
     Route::apiResource('salaries', SalaryController::class);
+    Route::get('salaries/create/form-data', [SalaryController::class, 'create']);
+    Route::get('salaries/{id}/form-data', [SalaryController::class, 'edit']);
     
     // Currency Management
     Route::apiResource('currencies', CurrencyController::class);

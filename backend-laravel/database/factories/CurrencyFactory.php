@@ -17,6 +17,11 @@ class CurrencyFactory extends Factory
             'symbol' => $this->faker->randomElement(['$', '€', '£', '¥']),
             'decimal_places' => 2,
             'is_active' => true,
+            'created_by' => null,
+            'updated_by' => null,
+            'deleted_by' => null,
+            'decimal_places' => 2,
+            'is_active' => true,
         ];
     }
 }

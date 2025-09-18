@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
             SalarySeeder::class,
             DepartmentManagerSeeder::class,
             AttendanceRecordSeeder::class,
+            AuditLogSeeder::class,
         ]);
     }
 }

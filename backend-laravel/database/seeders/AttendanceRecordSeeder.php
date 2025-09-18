@@ -22,12 +22,14 @@ class AttendanceRecordSeeder extends Seeder
                 if (rand(1, 100) <= 80) {
                     $checkIn = Carbon::parse($date->toDateString() . ' 09:00:00')->addMinutes(rand(0, 30));
                     $checkOut = (clone $checkIn)->addHours(8)->addMinutes(rand(0, 30));
+                    $hoursWorked = $checkIn->diffInHours($checkOut, true);
+                    
                     DB::table('attendance_records_' . date('Y'))->insert([
                         'employee_id' => $emp->id,
                         'check_in' => $checkIn,
                         'check_out' => $checkOut,
                         'source' => 'system_seed',
-                        'hours_worked' => $checkIn->diffInHours($checkOut),
+                        'hours_worked' => round($hoursWorked, 2),
                         'log_date' => $checkIn->toDateString(),
                         'created_at' => now(),
                         'updated_at' => now(),

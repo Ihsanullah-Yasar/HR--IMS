@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
-import SalaryForm from "@/components/Forms/salary-form";
+import SalaryForm from "@/components/Forms/salary/salary-form";
 import {
   getSalaryEditFormData,
   updateSalary,

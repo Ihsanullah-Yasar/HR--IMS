@@ -1,4 +1,4 @@
-import AttendanceForm from "@/components/forms/attendance-form";
+import AttendanceForm from "@/components/Forms/attendance/attendance-form";
 
 export default function CreateAttendancePage() {
   return <AttendanceForm />;
